@@ -54,6 +54,14 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 - Modify: `exact/path/to/existing.py:123-145`
 - Test: `tests/exact/path/to/test.py`
 
+**Changes (pseudo code):**
+- `file.py`: Create class Foo with method bar() that takes input X and returns Y
+- `existing.py:123-145`: Add validation check before process() call, raise ValueError if invalid
+
+**Design Reference:**
+- Wireframe: `mermaid-collab/diagrams/<wireframe-id>` (if applicable)
+- Design Doc: `docs/plans/YYYY-MM-DD-<topic>-design.md` section X
+
 **Step 1: Write the failing test**
 
 ```python
@@ -93,6 +101,25 @@ git commit -m "feat: add specific feature"
 - Exact commands with expected output
 - Reference relevant skills with @ syntax
 - DRY, YAGNI, TDD, frequent commits
+
+## Design Alignment Verification
+
+**Every task MUST be traceable to the design:**
+- Reference the specific section of the design doc that this task implements
+- If mermaid-collab wireframes/diagrams exist, reference them by ID
+- Verification steps must check against design, not just "does code work"
+
+**For UI tasks:**
+- Reference the wireframe diagram ID
+- Verification: "Compare implementation to wireframe `<id>` — all elements present and positioned correctly"
+
+**For architecture tasks:**
+- Reference the architecture/flow diagram ID
+- Verification: "Confirm data flow matches diagram `<id>`"
+
+**If design artifacts don't exist but should:**
+- Stop and create them in mermaid-collab before writing the task
+- The brainstorming skill should have created these — if missing, go back
 
 ## Execution Handoff
 
