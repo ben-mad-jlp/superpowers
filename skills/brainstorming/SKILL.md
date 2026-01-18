@@ -25,6 +25,32 @@ Start by understanding the current project context, then ask questions one at a 
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
 
+**Visualizing with Mermaid Collab:**
+
+When brainstorming involves visual artifacts, use the mermaid-collab server.
+
+*GUI/UI Design (ALWAYS use wireframes):*
+- When discussing screens, layouts, or user interfaces → create wireframe diagrams
+- Use `create_diagram(name, content)` with wireframe syntax
+- Iterate on wireframes as the design evolves
+- Preview with `preview_diagram(id)` so user can see in browser
+
+*Architecture & Flow Design:*
+- System architecture → flowchart diagrams
+- Data flow → sequence or flowchart diagrams
+- State machines → SMACH YAML or state diagrams
+- Component relationships → class or flowchart diagrams
+
+*Design Documents:*
+- Use `create_document(name, content)` for design specs
+- Iterate on documents with `update_document(id, content)`
+- Link related diagrams in the document
+
+*Workflow:*
+1. During "Exploring approaches" phase, create diagram(s) to visualize options
+2. During "Presenting the design" phase, update diagrams to match validated sections
+3. When writing final design doc, embed diagram references
+
 **Presenting the design:**
 - Once you believe you understand what you're building, present the design
 - Break it into sections of 200-300 words
