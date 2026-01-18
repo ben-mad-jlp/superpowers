@@ -15,27 +15,32 @@ Guide completion of development work by presenting clear options and handling ch
 
 ## The Process
 
-### Step 1: Verify Tests
+### Step 1: Verify Completion
 
-**Before presenting options, verify tests pass:**
+**Before presenting options, verify:**
 
+1. **Tests pass:**
 ```bash
 # Run project's test suite
 npm test / cargo test / pytest / go test ./...
 ```
 
-**If tests fail:**
+2. **Design alignment (if design artifacts exist):**
+- Open design doc — does implementation match?
+- Open mermaid-collab wireframes/diagrams — does implementation match?
+- Any deviations = not complete, go back and fix
+
+**If tests fail or design doesn't match:**
 ```
-Tests failing (<N> failures). Must fix before completing:
+Cannot proceed. Issues:
+- [test failures or design mismatches]
 
-[Show failures]
-
-Cannot proceed with merge/PR until tests pass.
+Must fix before completing.
 ```
 
 Stop. Don't proceed to Step 2.
 
-**If tests pass:** Continue to Step 2.
+**If tests pass AND design matches:** Continue to Step 2.
 
 ### Step 2: Determine Base Branch
 

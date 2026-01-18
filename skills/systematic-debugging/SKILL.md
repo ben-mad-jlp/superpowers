@@ -183,7 +183,13 @@ You MUST complete each phase before proceeding to the next.
    - ONE change at a time
    - No "while I'm here" improvements
    - No bundled refactoring
-
+   
+   **Stay in scope:**
+   - Fix ONLY the root cause identified
+   - Don't "improve" adjacent code
+   - Don't refactor while fixing
+   - If you notice other issues, log them for later — don't fix now
+   
 3. **Verify Fix**
    - Test passes now?
    - No other tests broken?

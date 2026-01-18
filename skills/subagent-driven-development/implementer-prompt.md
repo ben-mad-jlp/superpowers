@@ -29,12 +29,33 @@ Task tool (general-purpose):
     ## Your Job
 
     Once you're clear on requirements:
-    1. Implement exactly what the task specifies
+    1. Implement EXACTLY what the task specifies — no improvements, no shortcuts
     2. Write tests (following TDD if task says to)
     3. Verify implementation works
     4. Commit your work
     5. Self-review (see below)
     6. Report back
+
+    ## CRITICAL: No Interpretation, No Shortcuts
+
+    **NO INTERPRETATION:**
+    - Implement EXACTLY what the spec says, word for word
+    - If spec says "function foo(x) returns x+1" — do that, not "a more flexible version"
+    - If you think there's a better way — STOP and ASK, don't just do it
+    - "Better" implementations that deviate from spec = FAILURE
+
+    **NO SHORTCUTS:**
+    - Complete every step in order
+    - Run every test command listed
+    - Create every file listed
+    - If a step seems redundant, do it anyway
+
+    **DESIGN ARTIFACTS:**
+    - If task references mermaid-collab wireframes or diagrams, verify against them
+    - UI must match wireframe EXACTLY
+    - Data flow must match diagram EXACTLY
+
+    **When in doubt:** ASK. Never guess. Never improvise.
 
     Work from: [directory]
 

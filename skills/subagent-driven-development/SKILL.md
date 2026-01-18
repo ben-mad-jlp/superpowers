@@ -88,6 +88,55 @@ digraph process {
 - `./spec-reviewer-prompt.md` - Dispatch spec compliance reviewer subagent
 - `./code-quality-reviewer-prompt.md` - Dispatch code quality reviewer subagent
 
+## Anti-Drift Rules (Apply to ALL Subagents)
+
+**FOR IMPLEMENTER:**
+- Implement EXACTLY what the task says — no "improvements"
+- If task says "create function foo(x) that returns x+1" — do exactly that
+- If something seems wrong, ASK the controller — don't "fix" it
+- Complete every step in order — no shortcuts
+- Run every verification — no skipping
+
+**FOR SPEC REVIEWER:**
+- Check implementation against spec LITERALLY, not "in spirit"
+- Flag ANY deviation, even if "better" than spec
+- Missing feature = fail
+- Extra feature = fail (YAGNI violation)
+- Different approach than specified = fail
+- If mermaid-collab diagrams exist, visually verify against them
+
+**FOR CODE QUALITY REVIEWER:**
+- Only runs AFTER spec compliance passes
+- Quality review cannot override spec compliance
+- "Better architecture" that deviates from spec = still a spec failure
+
+**DESIGN ARTIFACTS:**
+- If plan references mermaid-collab wireframes/diagrams, subagents MUST verify against them
+- Spec reviewer: "Does UI match wireframe `<id>` exactly?"
+- Spec reviewer: "Does data flow match diagram `<id>` exactly?"
+
+## Design Freeze
+
+Once execution begins, the design is FROZEN.
+
+**No changes during implementation:**
+- No "small tweaks" to requirements
+- No "I realized we need X" additions
+- No "let's just add this while we're here"
+- No scope creep, no matter how reasonable it sounds
+
+**If something needs to change:**
+1. STOP execution immediately
+2. Document what needs to change and why
+3. Go back to design doc — update it formally
+4. Update the plan to reflect changes
+5. THEN resume execution
+
+**Why this matters:**
+- Mid-implementation changes cause drift
+- "Quick additions" compound into chaos
+- The plan is a contract — honor it
+
 ## Example Workflow
 
 ```
@@ -210,6 +259,9 @@ Done!
 - Let implementer self-review replace actual review (both are needed)
 - **Start code quality review before spec compliance is ✅** (wrong order)
 - Move to next task while either review has open issues
+- Let implementer "improve" on the spec (interpretation drift)
+- Accept implementations that are "close enough" or "even better" than spec
+- Skip design artifact verification when diagrams are referenced
 
 **If subagent asks questions:**
 - Answer clearly and completely

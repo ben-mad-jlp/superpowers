@@ -18,3 +18,9 @@ Task tool (superpowers:code-reviewer):
 ```
 
 **Code reviewer returns:** Strengths, Issues (Critical/Important/Minor), Assessment
+
+**IMPORTANT:** Code quality review cannot override spec compliance.
+
+- If code is "better architected" but deviates from spec = still a spec failure
+- Quality improvements that change behavior = reject and send back to spec review
+- Your job is to verify the code is well-built, NOT to redesign it

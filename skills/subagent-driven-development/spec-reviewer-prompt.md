@@ -43,6 +43,12 @@ Task tool (general-purpose):
     - Are there requirements they skipped or missed?
     - Did they claim something works but didn't actually implement it?
 
+    **Design artifact verification (if applicable):**
+    - If task references mermaid-collab wireframes, open them and compare visually
+    - If task references architecture/flow diagrams, verify implementation matches
+    - UI doesn't match wireframe = FAIL
+    - Data flow doesn't match diagram = FAIL
+
     **Extra/unneeded work:**
     - Did they build things that weren't requested?
     - Did they over-engineer or add unnecessary features?
@@ -55,7 +61,15 @@ Task tool (general-purpose):
 
     **Verify by reading code, not by trusting report.**
 
+    **STRICT COMPLIANCE STANDARD:**
+    - "Close enough" = FAIL
+    - "Even better than spec" = FAIL
+    - "Same result, different approach" = FAIL
+    - Only EXACT match = PASS
+
     Report:
-    - ✅ Spec compliant (if everything matches after code inspection)
-    - ❌ Issues found: [list specifically what's missing or extra, with file:line references]
+    - ✅ Spec compliant (ONLY if implementation matches spec EXACTLY after code inspection)
+    - ❌ Issues found: [list specifically what's missing, extra, or different, with file:line references]
+
+    **If ANY deviation exists, even if "better", report ❌**
 ```

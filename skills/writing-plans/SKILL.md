@@ -28,6 +28,11 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 ## Plan Document Header
 
+**Design Artifacts:** 
+- Wireframes: [list mermaid-collab diagram IDs or "N/A"]
+- Architecture diagrams: [list IDs or "N/A"]
+- Design doc: `docs/plans/YYYY-MM-DD-<topic>-design.md`
+
 **Every plan MUST start with this header:**
 
 ```markdown

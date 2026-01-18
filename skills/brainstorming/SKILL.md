@@ -58,6 +58,13 @@ When brainstorming involves visual artifacts, use the mermaid-collab server.
 - Cover: architecture, components, data flow, error handling, testing
 - Be ready to go back and clarify if something doesn't make sense
 
+**Design completeness checklist (before moving to implementation):**
+- [ ] Every screen/UI has a wireframe in mermaid-collab
+- [ ] Every data flow/architecture decision has a diagram
+- [ ] No ambiguous language ("should handle errors appropriately" → specify HOW)
+- [ ] No TBD or "figure out later" items
+- [ ] Success criteria are measurable, not subjective
+
 ## After the Design
 
 **Documentation:**
