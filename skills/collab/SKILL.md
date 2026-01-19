@@ -5,13 +5,17 @@ description: Use when starting collaborative design work - creates isolated coll
 
 # Collab Sessions
 
-## Overview
+**⚠️ STOP - EXECUTE STEP 0 IMMEDIATELY ⚠️**
 
-Entry point for all collaborative design work. Creates and manages `.collab/` folder at project root, handles new vs resume sessions, and configures the mermaid-collab server to use the collab folder for storage.
+Do NOT improvise. Do NOT ask the user questions yet. Do NOT check random directories.
+
+**Execute Step 0 below RIGHT NOW before doing anything else.**
+
+> *Context: This skill manages `.collab/` folder at project root, handles new vs resume sessions, and configures the mermaid-collab MCP server.*
 
 ---
 
-## Step 0: Ensure MCP Server Running (Before Everything Else)
+## Step 0: Ensure MCP Server Running (EXECUTE THIS FIRST)
 
 Before calling any MCP tools, verify the mermaid-collab server is available.
 
