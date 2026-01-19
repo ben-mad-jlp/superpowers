@@ -1,5 +1,34 @@
 # Superpowers Release Notes
 
+## v4.6.0 (2026-01-19)
+
+### New Features
+
+**Git worktree option at implementation handoff**
+
+The rough-draft skill now offers users the choice to work in an isolated git worktree when transitioning to implementation:
+
+```
+Ready to move to executing-plans?
+  1. Yes, in current directory
+  2. Yes, in a new git worktree (recommended for larger features)
+  3. No, I need to revise something
+```
+
+**Benefits:**
+- Larger features get clean isolation from main branch
+- If implementation goes wrong, worktree is easy to discard
+- Small changes can skip the overhead by choosing option 1
+- Branch name defaults to `feature/<session-name>` with optional override
+- Worktree path tracked in collab-state.json for cleanup
+
+**Integration:**
+- Invokes `using-git-worktrees` skill for worktree creation
+- Handles setup (npm install, etc.) and test baseline verification
+- Falls back to current directory if worktree creation fails
+
+---
+
 ## v4.5.0 (2026-01-19)
 
 ### New Features
