@@ -13,39 +13,31 @@ Entry point for all collaborative design work. Creates and manages `.collab/` fo
 
 ## MANDATORY FIRST STEP - DO THIS IMMEDIATELY
 
-**DO NOT** check mermaid storage config first. **DO NOT** look at existing diagrams elsewhere.
+Use the `mcp__mermaid__list_collab_sessions` tool to check for existing sessions:
 
-**ONLY** `.collab/<session-name>/` folders are valid collab sessions. Diagrams/documents anywhere else are NOT collab sessions.
-
-```bash
-# STEP 1: Check if .collab exists and has sessions
-if [ -d ".collab" ] && [ -n "$(ls -d .collab/*/ 2>/dev/null)" ]; then
-    # Has existing sessions -> Go to RESUME FLOW
-    echo "Found existing collab sessions"
-else
-    # No .collab or empty -> Go to NEW COLLAB FLOW
-    echo "No existing sessions"
-fi
+```
+Tool: mcp__mermaid__list_collab_sessions
+Args: {}
 ```
 
+This returns:
+- `sessions`: Array of existing sessions with name, template, phase, lastActivity, pendingIssueCount, path
+- `baseDir`: The directory being searched (current working directory)
+
 **Based on result:**
-- **Existing sessions found** → Jump to "Resume Collab Flow" section
-- **No sessions** → Jump to "New Collab Flow" section
+- **`sessions` array is NOT empty** → Jump to "Resume Collab Flow" section
+- **`sessions` array is empty** → Jump to "New Collab Flow" section
 
 ---
 
 ## New Collab Flow
 
-### 1. Check/Create `.collab/` Folder
+### 1. Ensure .gitignore
+
+Before creating a session, verify `.collab/` is in .gitignore:
 
 ```bash
-# Check if .collab exists at project root
-if [ ! -d ".collab" ]; then
-    # Verify .collab is in .gitignore before creating
-    git check-ignore -q .collab 2>/dev/null || echo ".collab/" >> .gitignore
-
-    mkdir -p .collab
-fi
+git check-ignore -q .collab 2>/dev/null || echo ".collab/" >> .gitignore
 ```
 
 ### 2. Template Selection
@@ -63,64 +55,31 @@ What type of work is this?
 Which template?
 ```
 
-### 3. Generate Name
+### 3. Create Session
 
-Generate a memorable name using adjective-adjective-noun pattern:
+Use the `mcp__mermaid__create_collab_session` tool:
 
-```bash
-# Read random words from word lists (using sort -R for macOS compatibility)
-adj1=$(sort -R lib/words/adjectives.txt | head -1)
-adj2=$(sort -R lib/words/adjectives.txt | head -1)
-noun=$(sort -R lib/words/nouns.txt | head -1)
-
-# Combine into name
-name="${adj1}-${adj2}-${noun}"
-# Example: "bright-calm-river"
+```
+Tool: mcp__mermaid__create_collab_session
+Args: { "template": "<selected-template>" }
 ```
 
-### 4. Create Folder Structure
+This automatically:
+- Creates `.collab/` folder if it doesn't exist
+- Generates a memorable name (adjective-adjective-noun)
+- Creates the folder structure: `diagrams/`, `documents/`, `metadata.json`, `collab-state.json`
+- Returns `{ name, path, template, phase }`
 
-```bash
-mkdir -p ".collab/${name}/diagrams"
-mkdir -p ".collab/${name}/documents"
-```
-
-Create `metadata.json`:
-
-```json
-{
-  "name": "<name>",
-  "template": "<template>",
-  "createdAt": "<ISO-8601-timestamp>",
-  "description": ""
-}
-```
-
-Create `collab-state.json`:
-
-```json
-{
-  "phase": "brainstorming",
-  "template": "<template>",
-  "lastActivity": "<ISO-8601-timestamp>",
-  "pendingVerificationIssues": []
-}
-```
-
-### 5. Configure Mermaid Server Storage
+### 4. Configure Mermaid Server Storage
 
 Use the `mcp__mermaid__configure_storage` tool to point the server at the collab folder:
 
 ```
-Use: mcp__mermaid__configure_storage
-Args: { "storageDir": "/absolute/path/to/.collab/<name>" }
+Tool: mcp__mermaid__configure_storage
+Args: { "storageDir": "<path-from-create-response>" }
 ```
 
-This tells the existing MCP mermaid server to use the collab folder for all diagrams and documents.
-
-### 6. Transition to Brainstorming
-
-Invoke the brainstorming skill with the collab context:
+### 5. Transition to Brainstorming
 
 ```
 Collab session "<name>" created.
@@ -130,34 +89,15 @@ Design doc: .collab/<name>/documents/design.md
 Starting brainstorming phase...
 ```
 
+Invoke the brainstorming skill.
+
+---
+
 ## Resume Collab Flow
 
-### 1. Check for Existing Collabs
+### 1. Display Available Sessions
 
-```bash
-# Check if .collab exists and has any collab directories
-if [ ! -d ".collab" ] || [ -z "$(ls -d .collab/*/ 2>/dev/null)" ]; then
-    echo "No existing collab sessions found."
-    echo "Would you like to create a new one? (y/n)"
-    # If yes, transition to New Collab Flow
-    # If no, exit
-fi
-```
-
-### 2. List Existing Collabs
-
-```bash
-# List all directories in .collab/
-ls -d .collab/*/
-```
-
-### 3. Show Status for Each
-
-Display for each collab:
-- Name
-- Template type
-- Current phase (from collab-state.json)
-- Last activity timestamp
+The `list_collab_sessions` response already contains all session info. Display it:
 
 ```
 Existing collab sessions:
@@ -174,18 +114,22 @@ Existing collab sessions:
 Which session to resume? (or 'new' for a new session)
 ```
 
-### 4. User Selects One
+### 2. User Selects One
 
-Get user selection.
+Get user selection. If 'new', go to New Collab Flow.
 
-### 5. Load State
+### 3. Get Session State
 
-```bash
-# Read collab-state.json
-cat .collab/<name>/collab-state.json
+Use the `mcp__mermaid__get_collab_session_state` tool for full state details:
+
+```
+Tool: mcp__mermaid__get_collab_session_state
+Args: { "sessionName": "<selected-session-name>" }
 ```
 
-### 6. Check for Pending Verification Issues
+Returns: `{ name, path, phase, template, lastActivity, pendingVerificationIssues }`
+
+### 4. Check for Pending Verification Issues
 
 If `pendingVerificationIssues` is not empty, display them:
 
@@ -198,28 +142,46 @@ This session has pending verification issues:
 Address these before continuing? (y/n)
 ```
 
-### 7. Configure Mermaid Server Storage
-
-Use the `mcp__mermaid__configure_storage` tool to point the server at the collab folder:
+### 5. Configure Mermaid Server Storage
 
 ```
-Use: mcp__mermaid__configure_storage
-Args: { "storageDir": "/absolute/path/to/.collab/<name>" }
+Tool: mcp__mermaid__configure_storage
+Args: { "storageDir": "<path-from-state-response>" }
 ```
 
-### 8. Read Design Doc into Context
+### 6. Read Design Doc into Context
 
 ```bash
-# Read the design doc to restore context
 cat .collab/<name>/documents/design.md
 ```
 
-### 9. Continue at Current Phase
+Or use the Read tool to read the design document.
 
-Based on `phase` in collab-state.json:
-- `brainstorming` -> invoke brainstorming skill
-- `rough-draft/*` -> invoke rough-draft skill at appropriate phase
-- `implementation` -> invoke executing-plans skill
+### 7. Continue at Current Phase
+
+Based on `phase` in the state:
+- `brainstorming` → invoke brainstorming skill
+- `rough-draft/*` → invoke rough-draft skill at appropriate phase
+- `implementation` → invoke executing-plans skill
+
+---
+
+## Updating Session State
+
+When transitioning phases or recording issues, use:
+
+```
+Tool: mcp__mermaid__update_collab_session_state
+Args: {
+  "sessionName": "<name>",
+  "phase": "rough-draft/interface",  // optional
+  "pendingVerificationIssues": [...]  // optional
+}
+```
+
+This automatically updates `lastActivity`.
+
+---
 
 ## Folder Structure
 
@@ -278,53 +240,42 @@ Based on `phase` in collab-state.json:
 
 ## Quick Reference
 
-| Action | Command |
-|--------|---------|
-| New collab | Select template, generate name, create folder, configure storage |
-| Resume collab | List existing, select, load state, configure storage |
-| Configure storage | `mcp__mermaid__configure_storage({ storageDir: "<abs-path>" })` |
-| Get current storage | `mcp__mermaid__get_storage_config()` |
+| Action | MCP Tool |
+|--------|----------|
+| List sessions | `mcp__mermaid__list_collab_sessions()` |
+| Create session | `mcp__mermaid__create_collab_session({ template })` |
+| Get session state | `mcp__mermaid__get_collab_session_state({ sessionName })` |
+| Update session state | `mcp__mermaid__update_collab_session_state({ sessionName, phase?, pendingVerificationIssues? })` |
+| Configure storage | `mcp__mermaid__configure_storage({ storageDir })` |
 
 ## Common Mistakes
 
 ### Checking mermaid storage config first
 
-- **Problem:** Mermaid server may have diagrams from previous work that are NOT collab sessions. Checking storage first leads to confusion and treating random diagrams as "sessions"
-- **Fix:** ALWAYS check `.collab/` folder first. Only `.collab/<name>/` folders are valid collab sessions. Ignore whatever mermaid server currently has loaded.
+- **Problem:** Mermaid server may have diagrams from previous work that are NOT collab sessions
+- **Fix:** ALWAYS use `list_collab_sessions` first. Only `.collab/<name>/` folders are valid sessions.
 
 ### Skipping .gitignore verification
 
 - **Problem:** .collab/ contents get tracked, pollute git status
-- **Fix:** Always use `git check-ignore` before creating .collab/
+- **Fix:** Always use `git check-ignore` before the first session creation
 
 ### Using relative paths for storage
 
 - **Problem:** MCP server may not resolve relative paths correctly
-- **Fix:** Always use absolute paths when calling configure_storage
-
-### Forgetting to check for empty collabs on resume
-
-- **Problem:** Resume flow shows empty list, confusing user
-- **Fix:** Check for existing collabs first, offer to create new if none
-
-### Using `shuf` for random word selection
-
-- **Problem:** `shuf` is GNU coreutils, not available on macOS by default
-- **Fix:** Use `sort -R | head -1` which works on both Linux and macOS
+- **Fix:** Use the `path` returned from `create_collab_session` or `get_collab_session_state`
 
 ## Red Flags
 
 **Never:**
-- Check mermaid storage config BEFORE checking `.collab/` folder
+- Check mermaid storage config BEFORE using `list_collab_sessions`
 - Treat diagrams outside `.collab/` as collab sessions
 - Create .collab/ without verifying it's ignored
-- Use relative paths when configuring storage
-- Assume `shuf` is available (use `sort -R | head -1`)
+- Manually create session folders (use `create_collab_session`)
 
 **Always:**
-- FIRST check if `.collab/` exists with sessions (MANDATORY FIRST STEP)
+- FIRST call `list_collab_sessions` (MANDATORY FIRST STEP)
 - Only treat `.collab/<name>/` folders as valid sessions
-- Verify .collab/ is in .gitignore before creating
-- Use absolute paths for configure_storage
+- Use MCP tools for session management
+- Use absolute paths from tool responses for configure_storage
 - Check for pending verification issues on resume
-- Call configure_storage when starting or resuming a collab

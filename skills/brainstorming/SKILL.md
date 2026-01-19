@@ -161,7 +161,11 @@ cat .collab/<name>/documents/design.md
 - Do NOT proceed to rough-draft until all sections pass
 
 **If gate passes:**
-- Update collab-state.json to `rough-draft/interface`
+- Update collab state using MCP tool:
+  ```
+  Tool: mcp__mermaid__update_collab_session_state
+  Args: { "sessionName": "<name>", "phase": "rough-draft/interface" }
+  ```
 - Invoke rough-draft skill
 
 ## Context Preservation
@@ -231,5 +235,5 @@ When invoked from collab skill, the following are already set up:
 - Design doc location: `.collab/<name>/documents/design.md`
 
 **State updates:**
-- On completion: Update `collab-state.json` phase to `rough-draft/interface`
-- Update `lastActivity` timestamp on each significant action
+- On completion: Use `mcp__mermaid__update_collab_session_state({ sessionName, phase: "rough-draft/interface" })`
+- The MCP tool automatically updates `lastActivity` timestamp

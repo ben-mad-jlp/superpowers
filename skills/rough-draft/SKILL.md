@@ -120,10 +120,9 @@ Before moving to Phase 2, run verification:
 
 **Update state on success:**
 
-```bash
-# Update collab-state.json
-jq '.phase = "rough-draft/pseudocode" | .lastActivity = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"' \
-  .collab/<name>/collab-state.json > tmp.json && mv tmp.json .collab/<name>/collab-state.json
+```
+Tool: mcp__mermaid__update_collab_session_state
+Args: { "sessionName": "<name>", "phase": "rough-draft/pseudocode" }
 ```
 
 ---
@@ -202,9 +201,9 @@ Before moving to Phase 3, run verification:
 
 **Update state on success:**
 
-```bash
-jq '.phase = "rough-draft/skeleton" | .lastActivity = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"' \
-  .collab/<name>/collab-state.json > tmp.json && mv tmp.json .collab/<name>/collab-state.json
+```
+Tool: mcp__mermaid__update_collab_session_state
+Args: { "sessionName": "<name>", "phase": "rough-draft/skeleton" }
 ```
 
 ---
@@ -371,9 +370,9 @@ Before moving to Phase 4, run verification:
 
 **Update state on success:**
 
-```bash
-jq '.phase = "implementation" | .lastActivity = "'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"' \
-  .collab/<name>/collab-state.json > tmp.json && mv tmp.json .collab/<name>/collab-state.json
+```
+Tool: mcp__mermaid__update_collab_session_state
+Args: { "sessionName": "<name>", "phase": "implementation" }
 ```
 
 ---
@@ -682,14 +681,16 @@ When invoked from collab workflow:
 
 If context is lost (compaction), re-read state:
 
-```bash
-# Read current state
-cat .collab/<name>/collab-state.json
+```
+# Get current session state
+Tool: mcp__mermaid__get_collab_session_state
+Args: { "sessionName": "<name>" }
 
 # Read design doc
-cat .collab/<name>/documents/design.md
+Tool: Read
+Args: { "file_path": ".collab/<name>/documents/design.md" }
 
-# Determine where to resume based on phase
+# Determine where to resume based on phase from state
 ```
 
 ---
@@ -719,7 +720,7 @@ cat .collab/<name>/documents/design.md
 
 ### Not updating collab-state.json
 - **Problem:** Resume doesn't know current phase
-- **Fix:** Update phase and lastActivity after each transition
+- **Fix:** Use `mcp__mermaid__update_collab_session_state` after each transition (automatically updates lastActivity)
 
 ## Red Flags
 

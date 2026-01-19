@@ -269,18 +269,20 @@ ${REPORT_TEMPLATE}
 1. If user chooses 'accept all':
    - Update the design doc to reflect accepted changes
    - Append to Decision Log section (create if doesn't exist)
-   - Clear any pending verification issues
+   - Clear any pending verification issues using:
+     \`mcp__mermaid__update_collab_session_state({ sessionName: \"${COLLAB_NAME}\", pendingVerificationIssues: [] })\`
 
 2. If user chooses 'reject all':
    - Keep design doc unchanged
-   - Add all drifts to pendingVerificationIssues in collab-state.json
+   - Add all drifts to pendingVerificationIssues using:
+     \`mcp__mermaid__update_collab_session_state({ sessionName: \"${COLLAB_NAME}\", pendingVerificationIssues: [...] })\`
    - User needs to fix code before transitioning
 
 3. If user chooses 'review each':
    - Go through each drift one by one
    - For each: ask accept/reject
    - Update design doc for accepted items
-   - Add rejected items to pendingVerificationIssues
+   - Add rejected items to pendingVerificationIssues using the MCP tool
 
 **Decision Log Format (append to design doc when drift accepted):**
 \`\`\`markdown
