@@ -3,11 +3,15 @@
   "description": "Collaborative design workflows for Claude Code: mermaid diagrams, wireframes, and design-to-implementation pipelines",
   "version": "4.1.1",
   "author": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "Ben Maderazo"
   },
-  "homepage": "https://github.com/obra/superpowers",
-  "repository": "https://github.com/obra/superpowers",
+  "homepage": "https://github.com/ben-mad-jlp/superpowers",
+  "repository": "https://github.com/ben-mad-jlp/superpowers",
+  "forkedFrom": {
+    "name": "superpowers",
+    "author": "Jesse Vincent",
+    "repository": "https://github.com/obra/superpowers"
+  },
   "license": "MIT",
-  "keywords": ["skills", "tdd", "debugging", "collaboration", "best-practices", "workflows"]
+  "keywords": ["collaboration", "mermaid", "wireframes", "design", "diagrams", "workflows"]
 }
