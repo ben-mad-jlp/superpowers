@@ -7,11 +7,6 @@
   },
   "homepage": "https://github.com/ben-mad-jlp/superpowers",
   "repository": "https://github.com/ben-mad-jlp/superpowers",
-  "forkedFrom": {
-    "name": "superpowers",
-    "author": "Jesse Vincent",
-    "repository": "https://github.com/obra/superpowers"
-  },
   "license": "MIT",
   "keywords": ["collaboration", "mermaid", "wireframes", "design", "diagrams", "workflows"]
 }
