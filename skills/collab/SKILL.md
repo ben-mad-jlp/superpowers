@@ -7,7 +7,7 @@ description: Use when starting collaborative design work - creates isolated coll
 
 ## Overview
 
-Entry point for all collaborative design work. Creates and manages `.collab/` folder at project root, handles new vs resume sessions, spawns mermaid-collab servers (one per collab), and manages ports and state.
+Entry point for all collaborative design work. Creates and manages `.collab/` folder at project root, handles new vs resume sessions, and configures the mermaid-collab server to use the collab folder for storage.
 
 **Announce at start:** "I'm using the collab skill to set up a collaborative design session."
 
@@ -22,7 +22,6 @@ if [ ! -d ".collab" ]; then
     git check-ignore -q .collab 2>/dev/null || echo ".collab/" >> .gitignore
 
     mkdir -p .collab
-    echo '{}' > .collab/ports.json
 fi
 ```
 
@@ -81,51 +80,28 @@ Create `collab-state.json`:
   "phase": "brainstorming",
   "template": "<template>",
   "lastActivity": "<ISO-8601-timestamp>",
-  "pendingVerificationIssues": [],
-  "serverPid": null,
-  "serverPort": null
+  "pendingVerificationIssues": []
 }
 ```
 
-### 5. Assign Port
+### 5. Configure Mermaid Server Storage
 
-Read `ports.json` and find next available port starting from 3737:
+Use the `mcp__mermaid__configure_storage` tool to point the server at the collab folder:
 
-```bash
-# Read current port assignments
-# Find first available port starting from 3737
-# Update ports.json with new assignment
+```
+Use: mcp__mermaid__configure_storage
+Args: { "storageDir": "/absolute/path/to/.collab/<name>" }
 ```
 
-`ports.json` format:
+This tells the existing MCP mermaid server to use the collab folder for all diagrams and documents.
 
-```json
-{
-  "3737": "happy-blue-mountain",
-  "3738": "swift-green-river"
-}
-```
-
-### 6. Spawn Mermaid-Collab Server
-
-```bash
-# Start server with STORAGE_DIR pointing to collab folder
-# STORAGE_DIR must be absolute path since we cd to server directory
-COLLAB_DIR="$(pwd)/.collab/<name>"
-cd ~/Code/claude-mermaid-collab && PORT=<port> STORAGE_DIR="$COLLAB_DIR" bun run src/server.ts &
-
-# Store PID in collab-state.json
-```
-
-Update `collab-state.json` with `serverPid` and `serverPort`.
-
-### 7. Transition to Brainstorming
+### 6. Transition to Brainstorming
 
 Invoke the brainstorming skill with the collab context:
 
 ```
 Collab session "<name>" created.
-Server running on port <port>.
+Storage configured at: .collab/<name>/
 Design doc: .collab/<name>/documents/design.md
 
 Starting brainstorming phase...
@@ -148,7 +124,7 @@ fi
 ### 2. List Existing Collabs
 
 ```bash
-# List all directories in .collab/ (excluding ports.json)
+# List all directories in .collab/
 ls -d .collab/*/
 ```
 
@@ -199,19 +175,13 @@ This session has pending verification issues:
 Address these before continuing? (y/n)
 ```
 
-### 7. Restart Server if Needed
+### 7. Configure Mermaid Server Storage
 
-Check if server is running:
+Use the `mcp__mermaid__configure_storage` tool to point the server at the collab folder:
 
-```bash
-# Check if PID from collab-state.json is still running
-if ! kill -0 <pid> 2>/dev/null; then
-    # Server not running, restart it
-    # STORAGE_DIR must be absolute path since we cd to server directory
-    COLLAB_DIR="$(pwd)/.collab/<name>"
-    cd ~/Code/claude-mermaid-collab && PORT=<port> STORAGE_DIR="$COLLAB_DIR" bun run src/server.ts &
-    # Update PID in collab-state.json
-fi
+```
+Use: mcp__mermaid__configure_storage
+Args: { "storageDir": "/absolute/path/to/.collab/<name>" }
 ```
 
 ### 8. Read Design Doc into Context
@@ -228,40 +198,10 @@ Based on `phase` in collab-state.json:
 - `rough-draft/*` -> invoke rough-draft skill at appropriate phase
 - `implementation` -> invoke executing-plans skill
 
-## Port Management
-
-### Port Assignment
-
-```bash
-# Read ports.json
-ports=$(cat .collab/ports.json)
-
-# Find next available port starting from 3737
-port=3737
-while [ -n "$(echo "$ports" | jq -r ".\"$port\" // empty")" ]; do
-    port=$((port + 1))
-done
-
-# Assign port to collab
-ports=$(echo "$ports" | jq ". + {\"$port\": \"$name\"}")
-echo "$ports" > .collab/ports.json
-```
-
-### Port Release
-
-On cleanup or collab deletion:
-
-```bash
-# Remove port assignment
-ports=$(cat .collab/ports.json | jq "del(.\"$port\")")
-echo "$ports" > .collab/ports.json
-```
-
 ## Folder Structure
 
 ```
 .collab/
-├── ports.json
 └── <collab-name>/
     ├── diagrams/
     ├── documents/
@@ -276,9 +216,7 @@ echo "$ports" > .collab/ports.json
   "phase": "brainstorming",
   "template": "feature",
   "lastActivity": "2025-01-18T10:30:00Z",
-  "pendingVerificationIssues": [],
-  "serverPid": null,
-  "serverPort": 3737
+  "pendingVerificationIssues": []
 }
 ```
 
@@ -304,44 +242,6 @@ echo "$ports" > .collab/ports.json
 }
 ```
 
-## Server Lifecycle Management
-
-### Spawn Server
-
-```bash
-# Start server in background
-# STORAGE_DIR must be absolute path since we cd to server directory
-COLLAB_DIR="$(pwd)/.collab/<name>"
-cd ~/Code/claude-mermaid-collab && PORT=<port> STORAGE_DIR="$COLLAB_DIR" bun run src/server.ts &
-pid=$!
-
-# Update state
-jq ".serverPid = $pid | .serverPort = $port" .collab/<name>/collab-state.json > tmp.json
-mv tmp.json .collab/<name>/collab-state.json
-```
-
-### Check Server Running
-
-```bash
-# Check if process exists
-if kill -0 <pid> 2>/dev/null; then
-    echo "Server running"
-else
-    echo "Server not running"
-fi
-```
-
-### Stop Server
-
-```bash
-# Send SIGTERM for graceful shutdown
-kill <pid>
-
-# Update state
-jq ".serverPid = null" .collab/<name>/collab-state.json > tmp.json
-mv tmp.json .collab/<name>/collab-state.json
-```
-
 ## Integration
 
 **Transitions to:**
@@ -357,12 +257,10 @@ mv tmp.json .collab/<name>/collab-state.json
 
 | Action | Command |
 |--------|---------|
-| New collab | Select template, generate name, create folder, spawn server |
-| Resume collab | List existing, select, load state, restart server if needed |
-| Assign port | Find first available from 3737, update ports.json |
-| Release port | Remove from ports.json on cleanup |
-| Spawn server | `cd ~/Code/claude-mermaid-collab && PORT=<n> STORAGE_DIR=<abs-path> bun run src/server.ts` |
-| Stop server | `kill <pid>` (SIGTERM) |
+| New collab | Select template, generate name, create folder, configure storage |
+| Resume collab | List existing, select, load state, configure storage |
+| Configure storage | `mcp__mermaid__configure_storage({ storageDir: "<abs-path>" })` |
+| Get current storage | `mcp__mermaid__get_storage_config()` |
 
 ## Common Mistakes
 
@@ -371,20 +269,15 @@ mv tmp.json .collab/<name>/collab-state.json
 - **Problem:** .collab/ contents get tracked, pollute git status
 - **Fix:** Always use `git check-ignore` before creating .collab/
 
-### Using relative paths for STORAGE_DIR
+### Using relative paths for storage
 
-- **Problem:** Server spawns from different directory, relative path breaks
-- **Fix:** Always compute absolute path before cd'ing to server directory
+- **Problem:** MCP server may not resolve relative paths correctly
+- **Fix:** Always use absolute paths when calling configure_storage
 
 ### Forgetting to check for empty collabs on resume
 
 - **Problem:** Resume flow shows empty list, confusing user
 - **Fix:** Check for existing collabs first, offer to create new if none
-
-### Not releasing ports on cleanup
-
-- **Problem:** Port assignments accumulate in ports.json, waste port space
-- **Fix:** Always remove port from ports.json when deleting collab
 
 ### Using `shuf` for random word selection
 
@@ -395,14 +288,11 @@ mv tmp.json .collab/<name>/collab-state.json
 
 **Never:**
 - Create .collab/ without verifying it's ignored
-- Use relative paths for STORAGE_DIR when cd'ing to server directory
-- Spawn server without recording PID in collab-state.json
-- Delete collab without releasing its port assignment
+- Use relative paths when configuring storage
 - Assume `shuf` is available (use `sort -R | head -1`)
 
 **Always:**
 - Verify .collab/ is in .gitignore before creating
-- Use absolute paths for STORAGE_DIR
-- Track server PID and port in collab-state.json
-- Release port when cleaning up collab
+- Use absolute paths for configure_storage
 - Check for pending verification issues on resume
+- Call configure_storage when starting or resuming a collab
