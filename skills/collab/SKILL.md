@@ -11,6 +11,113 @@ Entry point for all collaborative design work. Creates and manages `.collab/` fo
 
 ---
 
+## Step 0: Ensure MCP Server Running (Before Everything Else)
+
+Before calling any MCP tools, verify the mermaid-collab server is available.
+
+### 0.1 Test MCP Connection
+
+Try calling `mcp__mermaid__get_storage_config()`.
+
+- **If it succeeds** → MCP server is running, skip to "MANDATORY FIRST STEP"
+- **If it fails** → Server not running, continue to 0.2
+
+### 0.2 Check Cached Server Path
+
+Read `.collab/settings.json` if it exists:
+
+```bash
+cat .collab/settings.json 2>/dev/null
+```
+
+If file exists and contains `serverPath`:
+1. Verify the path exists: `test -d <serverPath>`
+2. Verify it's valid: `test -f <serverPath>/src/mcp/server.ts`
+3. If both pass → Jump to **0.6 Generate .mcp.json**
+4. If either fails → Continue to 0.3
+
+### 0.3 Search Common Locations
+
+Check these paths in order (expand `~` to home directory):
+
+```
+../claude-mermaid-collab
+~/Code/claude-mermaid-collab
+~/code/claude-mermaid-collab
+~/Projects/claude-mermaid-collab
+~/projects/claude-mermaid-collab
+~/dev/claude-mermaid-collab
+```
+
+For each path, check if `<path>/src/mcp/server.ts` exists.
+
+- **If found** → Jump to **0.5 Save Server Path**
+- **If none found** → Continue to 0.4
+
+### 0.4 Search with Find
+
+```bash
+find ~ -maxdepth 4 -type d -name "claude-mermaid-collab" 2>/dev/null | head -1
+```
+
+If result found and `<result>/src/mcp/server.ts` exists:
+- **Found** → Jump to **0.5 Save Server Path**
+- **Not found** → Ask user for path
+
+**Ask user:**
+```
+Could not find claude-mermaid-collab on your machine.
+
+Please provide the path to your claude-mermaid-collab directory:
+```
+
+Validate user's path has `src/mcp/server.ts`. If invalid, show error and stop.
+
+### 0.5 Save Server Path
+
+Ensure `.collab/` directory exists:
+
+```bash
+mkdir -p .collab
+```
+
+Save the found path to `.collab/settings.json`:
+
+```json
+{
+  "serverPath": "<found-path>"
+}
+```
+
+### 0.6 Generate .mcp.json
+
+Create/update `.mcp.json` at project root:
+
+```json
+{
+  "mcpServers": {
+    "mermaid": {
+      "command": "bun",
+      "args": ["run", "src/mcp/server.ts"],
+      "cwd": "<serverPath>"
+    }
+  }
+}
+```
+
+### 0.7 Notify User to Restart
+
+Display:
+```
+Created .mcp.json with mermaid-collab server at: <serverPath>
+
+Please restart Claude Code to load the MCP server, then run /collab again.
+```
+
+**Stop execution here.** User must restart Claude Code for the MCP server to load.
+
+---
+
 ## MANDATORY FIRST STEP - DO THIS IMMEDIATELY
 
 Use the `mcp__mermaid__list_collab_sessions` tool to check for existing sessions:
