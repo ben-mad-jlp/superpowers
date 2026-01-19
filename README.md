@@ -18,16 +18,26 @@ There's a bunch more to it, but that's the core of the system. And because the s
 
 ### Mermaid-Collab Server
 
-This plugin requires the [claude-mermaid-collab](https://github.com/ben-mad-jlp/claude-mermaid-collab) MCP server for diagram and wireframe features.
+This plugin requires the [claude-mermaid-collab](https://github.com/ben-mad-jlp/claude-mermaid-collab) server for diagram and wireframe features.
 
-**Clone the server:**
+**Install and start the server:**
 ```bash
 git clone https://github.com/ben-mad-jlp/claude-mermaid-collab.git
 cd claude-mermaid-collab
 bun install
+
+# Start the server (runs in background)
+bun run bin/mermaid-collab.ts start
 ```
 
-**Auto-detection:** When you run `/collab`, the plugin automatically searches for the mermaid-collab server in common locations (`~/Code/`, `~/Projects/`, sibling directories). If found, it generates the `.mcp.json` config automatically. You'll need to restart Claude Code once to load the MCP server.
+The server runs at `http://localhost:3737` and serves all your collab sessions. Start it once and it stays running - you don't need to restart it for each project.
+
+**Tip:** Add an alias for convenience:
+```bash
+alias mermaid-collab="bun run /path/to/claude-mermaid-collab/bin/mermaid-collab.ts"
+```
+
+Then just use `mermaid-collab start`, `mermaid-collab stop`, `mermaid-collab status`.
 
 ## Installation
 
