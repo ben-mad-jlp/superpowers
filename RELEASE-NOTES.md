@@ -1,5 +1,57 @@
 # Superpowers Release Notes
 
+## v4.8.0 (2026-01-19)
+
+### Breaking Changes
+
+**Multi-session server architecture**
+
+The mermaid-collab server now supports multiple projects and sessions simultaneously. This requires changes to how the server is started and how sessions are managed.
+
+**Migration steps:**
+1. Update claude-mermaid-collab to the latest version
+2. Start server manually with `mermaid-collab start` (one-time, stays running)
+3. Server now runs at `http://localhost:3737` and serves all sessions
+
+### New Features
+
+**Simplified collab skill (4 steps instead of 6+)**
+
+- Step 1: Check if server is running
+- Step 2: Find existing sessions
+- Step 3: Create new session (if needed)
+- Step 4: Start the selected phase
+
+**Session selector in dashboard**
+
+- Dropdown to switch between projects/sessions
+- Sessions grouped by project name
+- Selection persists across browser refreshes
+
+**CLI for server management**
+
+```bash
+mermaid-collab start   # Start server in background
+mermaid-collab stop    # Stop server
+mermaid-collab status  # Check if running
+```
+
+**Session registry**
+
+- Sessions tracked at `~/.mermaid-collab/sessions.json`
+- Each session stores diagrams/documents in `<project>/.collab/<session>/`
+
+### Technical Changes
+
+- **Stateless API** - All endpoints now require `?project=...&session=...` query params
+- **Removed** - `configure_storage`, `get_storage_config` MCP tools
+- **Removed** - Storage switching, file watcher (server is now stateless)
+- **Added** - `list_sessions`, `generate_session_name` MCP tools
+- **Simplified** - MCP server reduced from 1273 to 575 lines
+- **Simplified** - Collab skill reduced from 461 to 207 lines
+
+---
+
 ## v4.7.2 (2026-01-19)
 
 ### Bug Fixes
