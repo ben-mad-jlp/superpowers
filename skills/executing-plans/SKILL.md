@@ -134,6 +134,47 @@ Before executing ANY tasks, verify:
 
 **If anything is missing:** STOP. Go back to brainstorming/writing-plans. Do not proceed with incomplete specs.
 
+### Step 1.6: Create Task Execution Diagram
+
+When within a collab workflow, create a visual diagram showing all tasks and their dependencies:
+
+**Build diagram content from task dependency graph:**
+```
+graph TD
+    %% Node Definitions
+    <for each task: task-id(["task-id"])>
+
+    %% Dependencies
+    <for each dependency: dep-id --> task-id>
+
+    %% Styles (all waiting initially)
+    <for each task: style task-id fill:#e0e0e0,stroke:#9e9e9e>
+```
+
+**Create the diagram:**
+```
+Tool: mcp__mermaid__create_diagram
+Args: { "name": "task-execution", "content": <generated-content> }
+```
+
+**Display to user:**
+```
+Task execution diagram: <previewUrl>
+```
+
+**Style definitions for state changes:**
+| State | Style |
+|-------|-------|
+| waiting | `fill:#e0e0e0,stroke:#9e9e9e` |
+| executing | `fill:#bbdefb,stroke:#1976d2,stroke-width:3px` |
+| completed | `fill:#c8e6c9,stroke:#2e7d32` |
+| failed | `fill:#ffcdd2,stroke:#c62828` |
+
+**Update diagram on state change:**
+1. Read current diagram: `mcp__mermaid__get_diagram({ "id": "task-execution" })`
+2. Replace the style line for the task with the new style
+3. Update diagram: `mcp__mermaid__update_diagram({ "id": "task-execution", "content": <updated> })`
+
 ### Step 2: Execute Batch
 **Default: First 3 tasks** (or use dependency graph for collab workflow)
 
@@ -161,11 +202,30 @@ ready_tasks = tasks where:
    - Tasks explicitly marked `parallel: true`
    - OR tasks with no file overlap and no shared dependencies
 2. If multiple parallel-safe tasks exist:
-   - **REQUIRED:** Use `superpowers:subagent-driven-development` to dispatch them simultaneously
-   - Each subagent handles one task independently
-   - Track completion status for each
+   - Update task diagram: set all parallel tasks to "executing"
+   - **REQUIRED:** Spawn Task agents in parallel (single message, multiple tool calls)
+   - Each Task agent uses `superpowers:subagent-driven-development` for its task
+   - Task prompt includes: task ID, files, description, relevant pseudocode
+   - Wait for all agents to complete
+   - Update task diagram: completed → "completed", failed → "failed"
 3. If only sequential tasks remain:
    - Execute one at a time in topological order
+   - Update diagram before/after each task
+
+**Task agent prompt template:**
+```
+Use superpowers:subagent-driven-development skill.
+
+Task ID: <task-id>
+Files: <task-files>
+Description: <task-description>
+
+Pseudocode from design doc:
+<relevant-pseudocode>
+
+Implement this task following the subagent-driven-development workflow:
+implement → spec review → quality review
+```
 
 **Task Completion Handling:**
 When a task completes:
@@ -215,6 +275,32 @@ for each task T where T.depends-on includes completed_task:
   if all(T.depends-on) are completed:
     move T from pending to ready
 ```
+
+### Proposing Design Doc Changes
+
+When drift is detected and requires a design doc update, use the proposed tag:
+
+**For section-level changes:**
+```markdown
+<!-- status: proposed: <drift-description> -->
+<new-section-content>
+```
+
+**For inline changes:**
+```markdown
+<!-- propose-start: <drift-description> --><new-text><!-- propose-end -->
+```
+
+**Process:**
+1. Read current design doc
+2. Insert proposed content at appropriate location
+3. Update doc: `mcp__mermaid__update_document({ "id": "design", "content": <updated> })`
+4. Notify user: "Proposed change visible in design doc (cyan). Accept/reject in mermaid-collab UI."
+5. Wait for user decision before proceeding
+
+**After user decision:**
+- If accepted: proposed marker removed, content remains → continue execution
+- If rejected: content removed → address the drift differently or stop
 
 ### Step 3: Report
 When batch complete:

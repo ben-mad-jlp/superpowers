@@ -79,12 +79,27 @@ Tool: mcp__mermaid__configure_storage
 Args: { "storageDir": "<path-from-create-response>" }
 ```
 
-### 5. Transition to Brainstorming
+### 5. Display Server URL and Transition
 
+After configuring storage, create the design doc and display the server URL:
+
+**Create initial design doc:**
 ```
-Collab session "<name>" created.
-Storage configured at: .collab/<name>/
-Design doc: .collab/<name>/documents/design.md
+Tool: mcp__mermaid__create_document
+Args: { "name": "design", "content": "# Design\n\n## Problem / Goal\n\n*To be filled during brainstorming*\n\n## Key Decisions\n\n*Decisions will be documented as they are made*\n" }
+```
+
+**Get preview URL:**
+```
+Tool: mcp__mermaid__preview_document
+Args: { "id": "design" }
+```
+
+**Display to user:**
+```
+Session created: <name>
+Server: http://localhost:<port>
+Design doc: http://localhost:<port>/document.html?id=design
 
 Starting brainstorming phase...
 ```
@@ -156,6 +171,23 @@ cat .collab/<name>/documents/design.md
 ```
 
 Or use the Read tool to read the design document.
+
+### 6.5. Display Server URL
+
+Get the server URL and display it:
+
+```
+Tool: mcp__mermaid__preview_document
+Args: { "id": "design" }
+```
+
+**Display to user:**
+```
+Resuming session: <name>
+Server: http://localhost:<port>
+Design doc: http://localhost:<port>/document.html?id=design
+Phase: <current-phase>
+```
 
 ### 7. Continue at Current Phase
 
