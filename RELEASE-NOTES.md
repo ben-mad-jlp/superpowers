@@ -1,5 +1,36 @@
 # Superpowers Release Notes
 
+## v4.4.0 (2026-01-19)
+
+### New Features
+
+**User approval at workflow transitions**
+
+Enforces explicit user confirmation before transitioning between skills in the collab workflow.
+
+**New collab-cleanup skill:**
+- Archive design artifacts to `docs/designs/`
+- Delete session without saving
+- Keep session open for reference
+- Automatically prompted after finishing-a-development-branch
+
+**Transition confirmations added to:**
+- brainstorming → rough-draft
+- rough-draft → executing-plans
+- executing-plans → finishing-a-development-branch
+- finishing-a-development-branch → collab-cleanup
+
+**Section-level approval:**
+- Enhanced proposed tag workflow with accept/reject/edit options
+- User prompted after each design doc section
+
+**Other improvements:**
+- Added Writing Quality sections referencing elements-of-style
+- Added task completion tracking in collab-state.json
+- Removed disable-model-invocation flags from commands
+
+---
+
 ## v4.3.0 (2026-01-19)
 
 ### New Features

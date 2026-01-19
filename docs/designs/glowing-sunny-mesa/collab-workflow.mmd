@@ -1,0 +1,44 @@
+graph TD
+    %% Node Definitions
+    Start(["Start /collab"])
+    Brainstorm(("Brainstorming"))
+    RoughDraft(("Rough Draft"))
+    Executing(("Executing Plans"))
+    Finishing(("Finishing Branch"))
+    Cleanup(("Collab Cleanup"))
+    Done(["Done"])
+    
+    %% User Approval Checkpoints
+    Approve1{"Ready for rough-draft?"}
+    Approve2{"Ready for execution?"}
+    Approve3{"Ready to finish?"}
+    Approve4{"Cleanup session?"}
+
+    %% Connections
+    Start --> Brainstorm
+    Brainstorm --> Approve1
+    Approve1 -->|yes| RoughDraft
+    Approve1 -->|no| Brainstorm
+    RoughDraft --> Approve2
+    Approve2 -->|yes| Executing
+    Approve2 -->|no| RoughDraft
+    Executing --> Approve3
+    Approve3 -->|yes| Finishing
+    Approve3 -->|no| Executing
+    Finishing --> Approve4
+    Approve4 -->|yes| Cleanup
+    Approve4 -->|no| Done
+    Cleanup --> Done
+
+    %% Styles
+    style Start fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Done fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Brainstorm fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style RoughDraft fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Executing fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Finishing fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Cleanup fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Approve1 fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style Approve2 fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style Approve3 fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style Approve4 fill:#fff9c4,stroke:#f9a825,stroke-width:2px
