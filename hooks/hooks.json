@@ -22,5 +22,13 @@
         ]
       }
     ]
+  },
+  "manualHooks": {
+    "verify-phase": {
+      "description": "Verification hook with drift detection - compares implementation to design doc before phase transitions",
+      "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" verify-phase.sh",
+      "arguments": ["phase", "collab-name"],
+      "usage": "Invoke before transitioning between rough-draft phases (interface, pseudocode, skeleton, implementation)"
+    }
   }
 }
