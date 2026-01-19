@@ -1,0 +1,36 @@
+graph TD
+    %% Node Definitions
+    Start(["Start Execution"])
+    ParseGraph["Parse dependency graph"]
+    CreateDiagram["Create task-execution diagram"]
+    FindReady{"Ready tasks?"}
+    IdentifyParallel["Identify parallel-safe tasks"]
+    SpawnAgents["Spawn Task agents in parallel (each uses subagent-driven-development)"]
+    UpdateExecuting["Update diagram: tasks → executing"]
+    WaitComplete["Wait for agents to complete"]
+    UpdateComplete["Update diagram: tasks → completed/failed"]
+    MoreTasks{"More tasks?"}
+    Done(["All tasks complete"])
+
+    %% Connections
+    Start --> ParseGraph
+    ParseGraph --> CreateDiagram
+    CreateDiagram --> FindReady
+    FindReady -->|yes| IdentifyParallel
+    FindReady -->|no| Done
+    IdentifyParallel --> SpawnAgents
+    SpawnAgents --> UpdateExecuting
+    UpdateExecuting --> WaitComplete
+    WaitComplete --> UpdateComplete
+    UpdateComplete --> MoreTasks
+    MoreTasks -->|yes| FindReady
+    MoreTasks -->|no| Done
+
+    %% Styles
+    style Start fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Done fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style FindReady fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style MoreTasks fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style SpawnAgents fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style UpdateExecuting fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style UpdateComplete fill:#ffe0b2,stroke:#f57c00,stroke-width:2px

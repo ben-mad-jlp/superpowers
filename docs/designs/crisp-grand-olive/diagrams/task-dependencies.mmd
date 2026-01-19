@@ -1,0 +1,16 @@
+graph TD
+    %% Node Definitions
+    collab-server-url(["collab-server-url"])
+    executing-plans-diagram(["executing-plans-diagram"])
+    executing-plans-parallel(["executing-plans-parallel"])
+    executing-plans-proposed(["executing-plans-proposed"])
+
+    %% Dependencies
+    executing-plans-diagram --> executing-plans-parallel
+    executing-plans-parallel --> executing-plans-proposed
+
+    %% Styles
+    style collab-server-url fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style executing-plans-diagram fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style executing-plans-parallel fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style executing-plans-proposed fill:#bbdefb,stroke:#1976d2,stroke-width:2px
