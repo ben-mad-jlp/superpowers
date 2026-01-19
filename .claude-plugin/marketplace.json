@@ -8,7 +8,7 @@
     {
       "name": "superpowers-collab",
       "description": "Collaborative design workflows for Claude Code: mermaid diagrams, wireframes, and design-to-implementation pipelines",
-      "version": "4.1.1",
+      "version": "4.1.2",
       "source": "./",
       "author": {
         "name": "Ben Maderazo"
