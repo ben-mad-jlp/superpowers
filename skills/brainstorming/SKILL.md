@@ -11,6 +11,75 @@ Help turn ideas into fully formed designs and specs through natural collaborativ
 
 Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design in small sections (200-300 words), checking after each section whether it looks right so far.
 
+**When invoked from collab skill:** The design doc location is `.collab/<name>/documents/design.md`. Create it immediately and update continuously.
+
+## Live Design Doc
+
+When brainstorming within a collab session, maintain a persistent design document that survives context compaction.
+
+**Create immediately when brainstorming starts:**
+
+```bash
+# Create design doc with initial structure
+cat > .collab/<name>/documents/design.md << 'EOF'
+# <Topic> Design
+
+## Problem / Goal
+
+*To be filled during brainstorming*
+
+## Key Decisions
+
+*Decisions will be documented as they are made*
+
+## Success Criteria
+
+*To be defined*
+
+## Out of Scope
+
+*To be defined*
+
+---
+
+## Design Details
+
+*Sections added as exploration progresses*
+EOF
+```
+
+**Update continuously as topics emerge:**
+- After each significant decision, update the design doc immediately
+- Add new sections as topics are explored
+- Capture rationale for decisions, not just the decision itself
+- All diagrams are embedded inline automatically (sync-diagram-to-doc hook handles this)
+
+**Document structure evolves through brainstorming:**
+1. Initial skeleton created at start
+2. Problem/Goal filled in during understanding phase
+3. Key decisions added as approaches are explored
+4. Design details expanded during presentation phase
+5. Success criteria and out of scope refined at end
+
+## Template-Specific Focus
+
+Different templates require different emphasis during brainstorming:
+
+| Template | Primary Focus | Key Questions | Artifacts |
+|----------|---------------|---------------|-----------|
+| **feature** | Full design, complete solution | What problem does it solve? Who uses it? How does it integrate? | Wireframes, architecture diagram, data flow |
+| **bugfix** | Minimal intervention | How to reproduce? What's the root cause? Smallest fix? | Reproduction steps, root cause analysis, fix verification |
+| **refactor** | Safe transformation | Current state? Desired state? Migration path? | Before/after diagrams, migration plan, rollback strategy |
+| **spike** | Time-boxed exploration | What are we trying to learn? When do we stop? | Clear success criteria, time limit, decision points |
+
+**Feature template:** Explore fully - wireframes for every screen, architecture for every component, data flow for every interaction. No ambiguity allowed.
+
+**Bugfix template:** Focus on understanding before fixing. Reproduction steps first, root cause analysis second, minimal fix third. Resist scope creep.
+
+**Refactor template:** Document current state thoroughly before proposing changes. Define clear before/after. Plan migration path with rollback.
+
+**Spike template:** Set strict boundaries. Define what success looks like. Set time limit. Document decision points for go/no-go.
+
 ## The Process
 
 **Understanding the idea:**
@@ -65,14 +134,71 @@ When brainstorming involves visual artifacts, use the mermaid-collab server.
 - [ ] No TBD or "figure out later" items
 - [ ] Success criteria are measurable, not subjective
 
+## Completeness Gate (Before Rough-Draft)
+
+Before transitioning to rough-draft phase, verify the design doc contains all required sections:
+
+**Required sections:**
+- [ ] **Problem/Goal** - Clear statement of what we're solving and why
+- [ ] **Key Decisions** - At least one documented decision with rationale
+- [ ] **At least one diagram** - Visual representation of architecture, flow, or UI
+- [ ] **Success Criteria** - Measurable, testable criteria (not "works well")
+- [ ] **Out of Scope** - Explicit boundaries on what this work does NOT include
+
+**Gate check process:**
+
+```bash
+# Read design doc
+cat .collab/<name>/documents/design.md
+
+# Verify each required section exists and has content
+# If any section is missing or empty, do NOT proceed
+```
+
+**If gate fails:**
+- Identify which sections are incomplete
+- Return to relevant brainstorming phase to fill gaps
+- Do NOT proceed to rough-draft until all sections pass
+
+**If gate passes:**
+- Update collab-state.json to `rough-draft/interface`
+- Invoke rough-draft skill
+
+## Context Preservation
+
+Design docs survive context compaction. When resuming or after long conversations:
+
+**Re-read design doc to restore context:**
+
+```bash
+# Always re-read before continuing work
+cat .collab/<name>/documents/design.md
+
+# Also read any diagrams
+ls .collab/<name>/diagrams/
+```
+
+**After re-reading:**
+- Summarize current state briefly
+- Identify where brainstorming left off
+- Continue from that point
+
+**Update design doc with any new context** discovered during the conversation.
+
 ## After the Design
 
-**Documentation:**
+**Within collab workflow (called from collab skill):**
+- Design doc already exists at `.collab/<name>/documents/design.md`
+- Run completeness gate (see above)
+- If gate passes, transition to **rough-draft** skill
+- Update collab-state.json phase to `rough-draft/interface`
+
+**Standalone (not in collab workflow):**
 - Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
-**Implementation (if continuing):**
+**Implementation (if continuing without collab):**
 - Ask: "Ready to set up for implementation?"
 - Use superpowers:using-git-worktrees to create isolated workspace
 - Use superpowers:writing-plans to create detailed implementation plan
@@ -85,3 +211,25 @@ When brainstorming involves visual artifacts, use the mermaid-collab server.
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design in sections, validate each
 - **Be flexible** - Go back and clarify when something doesn't make sense
+- **Live documentation** - Update design doc as you go, not at the end
+
+## Integration
+
+**Called by:**
+- **collab** skill - When starting new collab or resuming at brainstorming phase
+- User directly via `/brainstorming` command for standalone design work
+
+**Transitions to:**
+- **rough-draft** skill - After completeness gate passes (within collab workflow)
+- **writing-plans** skill - For standalone design work leading to implementation
+
+**Collab workflow context:**
+When invoked from collab skill, the following are already set up:
+- `.collab/<name>/` folder exists
+- `collab-state.json` tracks phase as `brainstorming`
+- Mermaid-collab server running on assigned port
+- Design doc location: `.collab/<name>/documents/design.md`
+
+**State updates:**
+- On completion: Update `collab-state.json` phase to `rough-draft/interface`
+- Update `lastActivity` timestamp on each significant action
