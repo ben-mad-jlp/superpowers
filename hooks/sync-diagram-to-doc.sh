@@ -7,9 +7,30 @@
 
 set -euo pipefail
 
-# Determine plugin root directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
-PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+# Check for jq dependency
+if ! command -v jq &> /dev/null; then
+    echo "Error: jq is required but not installed" >&2
+    exit 1
+fi
+
+# Escape outputs for JSON using pure bash
+escape_for_json() {
+    local input="$1"
+    local output=""
+    local i char
+    for (( i=0; i<${#input}; i++ )); do
+        char="${input:$i:1}"
+        case "$char" in
+            $'\\') output+='\\' ;;
+            '"') output+='\"' ;;
+            $'\n') output+='\n' ;;
+            $'\r') output+='\r' ;;
+            $'\t') output+='\t' ;;
+            *) output+="$char" ;;
+        esac
+    done
+    printf '%s' "$output"
+}
 
 # Read JSON input from stdin
 json_input=$(cat)
@@ -122,7 +143,7 @@ if echo "$design_content" | grep -q "$marker_start"; then
 else
     # New diagram, append a section
     # Create a human-readable title from the diagram ID
-    diagram_title=$(echo "$diagram_id" | sed 's/-/ /g' | sed 's/\b\w/\u&/g')
+    diagram_title=$(echo "$diagram_id" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2)}1')
 
     new_section="
 
@@ -140,12 +161,16 @@ fi
 # Write updated design doc
 echo "$new_content" > "$design_doc"
 
+# Escape values for JSON output
+diagram_id_escaped=$(escape_for_json "$diagram_id")
+design_doc_escaped=$(escape_for_json "$design_doc")
+
 # Output success context for Claude
 cat <<EOF
 {
   "hookSpecificOutput": {
     "hookEventName": "PostToolUse",
-    "additionalContext": "Diagram '${diagram_id}' has been synced to the design document at ${design_doc}"
+    "additionalContext": "Diagram '${diagram_id_escaped}' has been synced to the design document at ${design_doc_escaped}"
   }
 }
 EOF
