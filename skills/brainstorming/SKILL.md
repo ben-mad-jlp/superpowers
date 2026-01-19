@@ -13,6 +13,79 @@ Start by understanding the current project context, then ask questions one at a 
 
 **When invoked from collab skill:** The design doc location is `.collab/<name>/documents/design.md`. Create it immediately and update continuously.
 
+## Phase State Machine
+
+Brainstorming follows a strict 5-phase state machine. **You cannot skip phases.**
+
+```dot
+digraph brainstorming_phases {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Start [label="Start", shape=oval, style=filled, fillcolor="#c8e6c9"];
+    EXPLORING [label="EXPLORING\nGather context", style=filled, fillcolor="#bbdefb"];
+    CLARIFYING [label="CLARIFYING\nOne item at a time", style=filled, fillcolor="#bbdefb"];
+    DESIGNING [label="DESIGNING\nPresent sections", style=filled, fillcolor="#bbdefb"];
+    VALIDATING [label="VALIDATING\nCompleteness gate", style=filled, fillcolor="#bbdefb"];
+    Transition [label="Transition to\nrough-draft", shape=oval, style=filled, fillcolor="#c8e6c9"];
+
+    Start -> EXPLORING;
+    EXPLORING -> CLARIFYING [label="context gathered"];
+    CLARIFYING -> DESIGNING [label="'what else?' confirmed"];
+    DESIGNING -> CLARIFYING [label="needs clarification", style=dashed];
+    DESIGNING -> VALIDATING [label="all sections validated"];
+    VALIDATING -> DESIGNING [label="gate failed", style=dashed];
+    VALIDATING -> Transition [label="gate passed"];
+}
+```
+
+| Phase | Purpose | Exit Criteria |
+|-------|---------|---------------|
+| **EXPLORING** | Gather context - read files, check git, understand scope | Context gathered, initial list of items formed |
+| **CLARIFYING** | Discuss each item one at a time, ask "what else?" | Every item discussed individually, user confirmed nothing else |
+| **DESIGNING** | Present approach in 200-300 word sections, get validation | Each section validated by user |
+| **VALIDATING** | Run completeness gate checklist | All required sections present, no TBDs |
+
+### Phase Transitions
+
+**EXPLORING → CLARIFYING**
+- Prerequisites: Read relevant files/context, formed initial list of items
+- Announce: "I've gathered context. Now let me discuss each item with you one at a time."
+
+**CLARIFYING → DESIGNING**
+- Prerequisites: Each item discussed individually (not batched), asked "Is there anything else?", user confirmed nothing else
+- Announce: "All items clarified. Now let me present the design approach."
+
+**DESIGNING → VALIDATING**
+- Prerequisites: Each section (200-300 words) presented separately, user validated each
+- Can backtrack to CLARIFYING if user raises new questions
+- Announce: "Design sections complete. Let me run the completeness gate."
+
+**VALIDATING → TRANSITION**
+- Prerequisites: Completeness checklist passed
+- Announce: "Completeness gate passed. Transitioning to rough-draft skill."
+
+### Proposed Tag Workflow
+
+During DESIGNING phase, for each section:
+1. Write section to design doc with `[PROPOSED]` marker
+2. Tell user: "I've added a proposed section to the design doc. Please review."
+3. Ask: "Does this section look right?"
+4. If accepted: remove `[PROPOSED]` marker, continue to next section
+5. If rejected: discuss, revise, repeat
+
+### Red Flags - Phase Violations
+
+If you catch yourself doing any of these, STOP and correct:
+
+| Violation | Correction |
+|-----------|------------|
+| Presenting multiple items at once | Go back to CLARIFYING, discuss one at a time |
+| Asking for batch selection ("which of these 5?") | Discuss each item individually first |
+| Moving to DESIGNING without asking "what else?" | Return to CLARIFYING, ask the question |
+| Editing files during brainstorming | Cannot edit until after rough-draft completes |
+| Skipping to implementation | Must go through rough-draft first |
+
 ## Live Design Doc
 
 When brainstorming within a collab session, maintain a persistent design document that survives context compaction.
@@ -82,17 +155,28 @@ Different templates require different emphasis during brainstorming:
 
 ## The Process
 
-**Understanding the idea:**
+**EXPLORING phase:**
 - Check out the current project state first (files, docs, recent commits)
-- Ask questions one at a time to refine the idea
-- Prefer multiple choice questions when possible, but open-ended is fine too
-- Only one question per message - if a topic needs more exploration, break it into multiple questions
-- Focus on understanding: purpose, constraints, success criteria
+- Form an initial list of items/topics to discuss
+- Focus on gathering context, not making decisions yet
 
-**Exploring approaches:**
+**CLARIFYING phase:**
+- Discuss ONE item at a time - never batch multiple items
+- Ask questions to refine each item before moving to the next
+- Prefer multiple choice questions when possible
+- After discussing all items, ask: "Is there anything else?"
+- Only proceed when user confirms nothing else to discuss
+
+**DESIGNING phase - Exploring approaches:**
 - Propose 2-3 different approaches with trade-offs
 - Present options conversationally with your recommendation and reasoning
 - Lead with your recommended option and explain why
+
+**DESIGNING phase - Presenting sections:**
+- Write each section to design doc with `[PROPOSED]` tag
+- Present sections of 200-300 words, one at a time
+- Ask user to review in collab viewer after each section
+- Get explicit validation before moving to next section
 
 **Visualizing with Mermaid Collab:**
 
@@ -199,7 +283,6 @@ ls .collab/<name>/diagrams/
 
 **Standalone (not in collab workflow):**
 - Write the validated design to `docs/plans/YYYY-MM-DD-<topic>-design.md`
-- Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
 **Implementation (if continuing without collab):**

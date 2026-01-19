@@ -377,6 +377,109 @@ Args: { "sessionName": "<name>", "phase": "implementation" }
 
 ---
 
+## Proposed Tag Workflow
+
+For each phase (INTERFACE, PSEUDOCODE, SKELETON), use the proposed tag workflow before verification:
+
+1. Write artifact to design doc with `[PROPOSED]` marker
+2. Tell user: "I've added the [interface/pseudocode/skeleton] to the design doc. Please review."
+3. Ask: "Does this look right?"
+4. If accepted: remove `[PROPOSED]` marker, proceed to drift check
+5. If rejected: discuss, revise, repeat
+
+This ensures user reviews each artifact before it becomes part of the design.
+
+---
+
+## Drift Detection
+
+After each phase's `[PROPOSED]` content is accepted, check if it matches the original design.
+
+```dot
+digraph drift_detection {
+    rankdir=TB;
+    node [shape=box, style=rounded];
+
+    Produce [label="Produce artifact", style=filled, fillcolor="#ffe0b2"];
+    Compare [label="Compare to\noriginal design", shape=diamond, style=filled, fillcolor="#fff9c4"];
+    Continue [label="Continue to\nnext phase", shape=oval, style=filled, fillcolor="#c8e6c9"];
+    Present [label="Present drift\nwith pros/cons", style=filled, fillcolor="#bbdefb"];
+    KeepDecision [label="User: Keep?", shape=diamond, style=filled, fillcolor="#fff9c4"];
+    UpdateDesign [label="Update design doc", style=filled, fillcolor="#ffe0b2"];
+    Significance [label="AI assesses\nsignificance", style=filled, fillcolor="#bbdefb"];
+    BackDecision [label="User: Back to\nbrainstorming?", shape=diamond, style=filled, fillcolor="#fff9c4"];
+    BackBrainstorm [label="Back to\nbrainstorming", shape=oval, style=filled, fillcolor="#c8e6c9"];
+    RestartRec [label="AI recommends\nrestart point", style=filled, fillcolor="#bbdefb"];
+    RestartDecision [label="User: Restart\nfrom where?", shape=diamond, style=filled, fillcolor="#fff9c4"];
+
+    Produce -> Compare;
+    Compare -> Continue [label="no drift"];
+    Compare -> Present [label="drift detected"];
+    Present -> KeepDecision;
+    KeepDecision -> UpdateDesign [label="yes"];
+    KeepDecision -> RestartRec [label="no"];
+    UpdateDesign -> Significance;
+    Significance -> BackDecision;
+    BackDecision -> BackBrainstorm [label="yes"];
+    BackDecision -> Continue [label="no"];
+    RestartRec -> RestartDecision;
+    RestartDecision -> Continue [label="current phase"];
+}
+```
+
+### When to Check for Drift
+
+Run drift detection after each phase's artifact is accepted:
+- After INTERFACE accepted → compare to original design
+- After PSEUDOCODE accepted → compare to design + interface
+- After SKELETON accepted → compare to design + interface + pseudocode
+
+### Presenting Drift
+
+When drift is detected, present it clearly:
+
+```
+**Drift detected:** [What changed]
+
+**Original design:** [What the design doc specified]
+**Current artifact:** [What was just produced]
+
+**Pros:**
+- [Benefit 1]
+- [Benefit 2]
+
+**Cons:**
+- [Drawback 1]
+- [Drawback 2]
+
+**Recommendation:** [Keep/Discard] - [Reasoning]
+
+Keep this change? [Yes / No]
+```
+
+### If User Keeps Change
+
+1. Design doc is already updated (via accepted proposal)
+2. Assess significance:
+   - **Minor:** Affects one component, no architectural change
+   - **Significant:** Affects multiple components or changes architecture
+3. Present: "This is [minor/significant] because [reasons]. I recommend [continuing/returning to brainstorming]."
+4. Ask: "Go back to brainstorming? [Yes / No]"
+5. If yes → transition to brainstorming skill
+6. If no → continue to next rough-draft phase
+
+### If User Discards Change
+
+1. Revert the design doc to before the proposal
+2. Recommend restart point:
+   - **Beginning (INTERFACE):** If drift affects foundational decisions
+   - **Current phase:** If drift is isolated to this phase
+3. Present: "I recommend restarting from [beginning/current phase] because [reasons]."
+4. Ask: "Restart from? [Beginning / Current phase]"
+5. Execute the restart
+
+---
+
 ## Phase 4: Implementation Handoff
 
 Hand off to executing-plans with the dependency graph.
