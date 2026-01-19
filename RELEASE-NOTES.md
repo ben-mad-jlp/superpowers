@@ -1,5 +1,46 @@
 # Superpowers Release Notes
 
+## v4.5.0 (2026-01-19)
+
+### New Features
+
+**Task execution diagram visualization**
+
+The executing-plans skill now creates a live mermaid diagram showing all tasks and their execution status:
+
+- Creates `task-execution` diagram at start of execution
+- Updates task states in real-time: waiting (gray) → executing (blue) → completed (green) / failed (red)
+- Visualizes task dependencies as edges in the diagram
+
+**Server URL display on collab session creation**
+
+The collab skill now displays the mermaid-collab server URL immediately when creating or resuming a session:
+
+```
+Session created: crisp-grand-olive
+Server: http://localhost:3737
+Design doc: http://localhost:3737/document.html?id=design
+```
+
+**Clarified parallel dispatch pattern**
+
+The executing-plans skill now documents the layered architecture for parallel task execution:
+
+- executing-plans spawns multiple Task agents in parallel (single message, multiple tool calls)
+- Each Task agent uses subagent-driven-development for its task
+- Full review loop per task: implement → spec review → quality review
+- Diagram updates track progress across parallel waves
+
+**Proposed tag workflow for design doc drift**
+
+When drift is detected during implementation, Claude uses the proposed tag to suggest design doc changes:
+
+- Section-level: `<!-- status: proposed: description -->`
+- Inline: `<!-- propose-start: description -->text<!-- propose-end -->`
+- User accepts/rejects in mermaid-collab UI (cyan highlight)
+
+---
+
 ## v4.4.0 (2026-01-19)
 
 ### New Features
