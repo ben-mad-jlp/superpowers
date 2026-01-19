@@ -9,7 +9,30 @@ description: Use when starting collaborative design work - creates isolated coll
 
 Entry point for all collaborative design work. Creates and manages `.collab/` folder at project root, handles new vs resume sessions, and configures the mermaid-collab server to use the collab folder for storage.
 
-**Announce at start:** "I'm using the collab skill to set up a collaborative design session."
+---
+
+## MANDATORY FIRST STEP - DO THIS IMMEDIATELY
+
+**DO NOT** check mermaid storage config first. **DO NOT** look at existing diagrams elsewhere.
+
+**ONLY** `.collab/<session-name>/` folders are valid collab sessions. Diagrams/documents anywhere else are NOT collab sessions.
+
+```bash
+# STEP 1: Check if .collab exists and has sessions
+if [ -d ".collab" ] && [ -n "$(ls -d .collab/*/ 2>/dev/null)" ]; then
+    # Has existing sessions -> Go to RESUME FLOW
+    echo "Found existing collab sessions"
+else
+    # No .collab or empty -> Go to NEW COLLAB FLOW
+    echo "No existing sessions"
+fi
+```
+
+**Based on result:**
+- **Existing sessions found** → Jump to "Resume Collab Flow" section
+- **No sessions** → Jump to "New Collab Flow" section
+
+---
 
 ## New Collab Flow
 
@@ -264,6 +287,11 @@ Based on `phase` in collab-state.json:
 
 ## Common Mistakes
 
+### Checking mermaid storage config first
+
+- **Problem:** Mermaid server may have diagrams from previous work that are NOT collab sessions. Checking storage first leads to confusion and treating random diagrams as "sessions"
+- **Fix:** ALWAYS check `.collab/` folder first. Only `.collab/<name>/` folders are valid collab sessions. Ignore whatever mermaid server currently has loaded.
+
 ### Skipping .gitignore verification
 
 - **Problem:** .collab/ contents get tracked, pollute git status
@@ -287,11 +315,15 @@ Based on `phase` in collab-state.json:
 ## Red Flags
 
 **Never:**
+- Check mermaid storage config BEFORE checking `.collab/` folder
+- Treat diagrams outside `.collab/` as collab sessions
 - Create .collab/ without verifying it's ignored
 - Use relative paths when configuring storage
 - Assume `shuf` is available (use `sort -R | head -1`)
 
 **Always:**
+- FIRST check if `.collab/` exists with sessions (MANDATORY FIRST STEP)
+- Only treat `.collab/<name>/` folders as valid sessions
 - Verify .collab/ is in .gitignore before creating
 - Use absolute paths for configure_storage
 - Check for pending verification issues on resume
