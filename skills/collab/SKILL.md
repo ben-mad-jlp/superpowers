@@ -43,8 +43,9 @@ cat .collab/settings.json 2>/dev/null
 If file exists and contains `serverPath`:
 1. Verify the path exists: `test -d <serverPath>`
 2. Verify it's valid: `test -f <serverPath>/src/mcp/server.ts`
-3. If both pass → Jump to **0.6 Generate .mcp.json**
-4. If either fails → Continue to 0.3
+3. If both pass AND `.mcp.json` already exists → Jump to **0.6b Diagnose Connection Failure**
+4. If both pass AND `.mcp.json` is missing → Jump to **0.6 Generate .mcp.json**
+5. If either fails → Continue to 0.3
 
 ### 0.3 Search Common Locations
 
@@ -101,19 +102,84 @@ Save the found path to `.collab/settings.json`:
 
 ### 0.6 Generate .mcp.json
 
-Create/update `.mcp.json` at project root:
+**First, get the absolute path to bun** (required for Claude Code to find it):
+
+```bash
+which bun
+```
+
+If bun is not found, ask the user to install it: `curl -fsSL https://bun.sh/install | bash`
+
+**Then create/update `.mcp.json` at project root using the absolute bun path:**
 
 ```json
 {
   "mcpServers": {
     "mermaid": {
-      "command": "bun",
+      "command": "<absolute-path-to-bun>",
       "args": ["run", "src/mcp/server.ts"],
       "cwd": "<serverPath>"
     }
   }
 }
 ```
+
+Example with real paths:
+```json
+{
+  "mcpServers": {
+    "mermaid": {
+      "command": "/Users/username/.bun/bin/bun",
+      "args": ["run", "src/mcp/server.ts"],
+      "cwd": "/Users/username/Code/claude-mermaid-collab"
+    }
+  }
+}
+```
+
+### 0.6b Diagnose Connection Failure
+
+If you reach here, `.mcp.json` exists with correct config but MCP calls fail. This means:
+- User already restarted Claude Code
+- The server is configured but not connecting
+
+**Run diagnostics:**
+
+```bash
+# Get absolute bun path
+which bun || echo "BUN NOT FOUND"
+
+# Check what command is in .mcp.json
+cat .mcp.json | grep command
+
+# Try starting server manually to see errors
+cd <serverPath> && timeout 3 bun run src/mcp/server.ts 2>&1 || true
+```
+
+**Check if .mcp.json uses absolute bun path:**
+- Read the `command` field from `.mcp.json`
+- If it's just `"bun"` (not an absolute path like `/Users/.../bun`), this is likely the problem
+- **Fix:** Update `.mcp.json` to use the absolute path from `which bun`
+
+**If absolute path is already correct, display to user:**
+```
+MCP server configured but not connecting.
+
+Server path: <serverPath>
+Bun location: <which bun result>
+Server test: <startup output or error>
+
+Common fixes:
+1. Ensure bun is installed: curl -fsSL https://bun.sh/install | bash
+2. Install server dependencies: cd <serverPath> && bun install
+3. Check for port conflicts or other errors above
+
+After fixing, restart Claude Code and run /collab again.
+```
+
+**Stop execution here.** Do NOT loop back to search steps.
+
+---
 
 ### 0.7 Notify User to Restart
 
