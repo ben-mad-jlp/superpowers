@@ -15,12 +15,18 @@ Entry point for all collaborative design work. Creates and manages `.collab/` fo
 
 Before calling any MCP tools, verify the mermaid-collab server is available.
 
-### 0.1 Test MCP Connection
+### 0.1 Check if .mcp.json Exists
 
-Try calling `mcp__mermaid__get_storage_config()`.
+**IMPORTANT:** Check for `.mcp.json` file FIRST using bash, before attempting any MCP tool calls:
 
-- **If it succeeds** → MCP server is running, skip to "MANDATORY FIRST STEP"
-- **If it fails** → Server not running, continue to 0.2
+```bash
+test -f .mcp.json && echo "exists" || echo "missing"
+```
+
+- **If `.mcp.json` exists** → Try calling `mcp__mermaid__get_storage_config()`
+  - If MCP call succeeds → Skip to "MANDATORY FIRST STEP"
+  - If MCP call fails → Continue to 0.2
+- **If `.mcp.json` is missing** → Continue to 0.2 (do NOT try MCP calls - they won't work)
 
 ### 0.2 Check Cached Server Path
 
