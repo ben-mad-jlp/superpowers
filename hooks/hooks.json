@@ -10,6 +10,31 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__mermaid__create_diagram|mcp__mermaid__update_diagram",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" sync-diagram-to-doc.sh"
+          }
+        ]
+      }
     ]
+  },
+  "manualHooks": {
+    "verify-phase": {
+      "description": "Verification hook with drift detection - compares implementation to design doc before phase transitions",
+      "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" verify-phase.sh",
+      "arguments": ["phase", "collab-name"],
+      "usage": "Invoke before transitioning between rough-draft phases (interface, pseudocode, skeleton, implementation)"
+    },
+    "collab-cleanup": {
+      "description": "Cleanup hook for completed collabs - copies artifacts to docs/designs/ and optionally deletes collab folder",
+      "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" collab-cleanup.sh",
+      "arguments": ["collab-name"],
+      "usage": "Invoke after implementation is complete to graduate design artifacts and clean up the collab folder"
+    }
   }
 }
