@@ -1,5 +1,19 @@
 # Superpowers Release Notes
 
+## v4.7.1 (2026-01-19)
+
+### Bug Fixes
+
+**Fixed Step 0 infinite restart loop**
+
+- Step 0.2 now checks if `.mcp.json` already exists before deciding to regenerate
+- Added Step 0.6b to diagnose connection failures instead of looping endlessly
+- Step 0.6 now detects absolute bun path (Claude Code requires absolute paths for commands)
+
+**Root cause:** Claude Code spawns MCP servers without the user's shell PATH, so `"command": "bun"` fails. Now uses `which bun` to get the absolute path.
+
+---
+
 ## v4.7.0 (2026-01-19)
 
 ### New Features
