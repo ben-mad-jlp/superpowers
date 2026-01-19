@@ -1,28 +1,33 @@
-# Superpowers
+# Superpowers Collab
 
-Superpowers is a complete software development workflow for your coding agents, built on top of a set of composable "skills" and some initial instructions that make sure your agent uses them.
+Superpowers Collab extends the Superpowers workflow with collaborative design features powered by a live mermaid diagram server. Create wireframes, architecture diagrams, and design documents with real-time preview while brainstorming with your coding agent.
 
 ## How it works
 
-It starts from the moment you fire up your coding agent. As soon as it sees that you're building something, it *doesn't* just jump into trying to write code. Instead, it steps back and asks you what you're really trying to do. 
+It starts from the moment you fire up your coding agent. As soon as it sees that you're building something, it *doesn't* just jump into trying to write code. Instead, it steps back and asks you what you're really trying to do.
 
-Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. 
+Once it's teased a spec out of the conversation, it shows it to you in chunks short enough to actually read and digest. **With the mermaid-collab server, you can see wireframes and diagrams in real-time as the design evolves.**
 
-After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY. 
+After you've signed off on the design, your agent puts together an implementation plan that's clear enough for an enthusiastic junior engineer with poor taste, no judgement, no project context, and an aversion to testing to follow. It emphasizes true red/green TDD, YAGNI (You Aren't Gonna Need It), and DRY.
 
 Next up, once you say "go", it launches a *subagent-driven-development* process, having agents work through each engineering task, inspecting and reviewing their work, and continuing forward. It's not uncommon for Claude to be able to work autonomously for a couple hours at a time without deviating from the plan you put together.
 
 There's a bunch more to it, but that's the core of the system. And because the skills trigger automatically, you don't need to do anything special. Your coding agent just has Superpowers.
 
+## Prerequisites
 
-## Sponsorship
+### Mermaid-Collab Server
 
-If Superpowers has helped you do stuff that makes money and you are so inclined, I'd greatly appreciate it if you'd consider [sponsoring my opensource work](https://github.com/sponsors/obra).
+This plugin requires the [claude-mermaid-collab](https://github.com/ben-mad-jlp/claude-mermaid-collab) MCP server for diagram and wireframe features.
 
-Thanks! 
+**Clone the server:**
+```bash
+git clone https://github.com/ben-mad-jlp/claude-mermaid-collab.git
+cd claude-mermaid-collab
+bun install
+```
 
-- Jesse
-
+**Auto-detection:** When you run `/collab`, the plugin automatically searches for the mermaid-collab server in common locations (`~/Code/`, `~/Projects/`, sibling directories). If found, it generates the `.mcp.json` config automatically. You'll need to restart Claude Code once to load the MCP server.
 
 ## Installation
 
@@ -33,13 +38,13 @@ Thanks!
 In Claude Code, register the marketplace first:
 
 ```bash
-/plugin marketplace add obra/superpowers-marketplace
+/plugin marketplace add ben-mad-jlp/superpowers-collab-dev
 ```
 
 Then install the plugin from this marketplace:
 
 ```bash
-/plugin install superpowers@superpowers-marketplace
+/plugin install superpowers-collab@superpowers-collab-dev
 ```
 
 ### Verify Installation
@@ -52,30 +57,10 @@ Check that skills appear:
 
 ```
 # Should see skills like:
-# /superpowers:brainstorming - Interactive design refinement
-# /superpowers:collab - Design-to-implementation pipeline
-# /superpowers:writing-plans - Create implementation plan
+# /superpowers-collab:brainstorming - Interactive design refinement
+# /superpowers-collab:collab - Design-to-implementation pipeline
+# /superpowers-collab:writing-plans - Create implementation plan
 ```
-
-### Codex
-
-Tell Codex:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.codex.md](docs/README.codex.md)
-
-### OpenCode
-
-Tell OpenCode:
-
-```
-Fetch and follow instructions from https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.opencode/INSTALL.md
-```
-
-**Detailed docs:** [docs/README.opencode.md](docs/README.opencode.md)
 
 ## The Basic Workflow
 
@@ -116,9 +101,11 @@ For complex features that need structured design-to-implementation flow, use the
 
 ### Key Features
 
+- **Live diagrams** - Create flowcharts, wireframes, and architecture diagrams with real-time browser preview
 - **Context persistence** - State survives across conversations in `.collab/<name>/`
 - **Design drift detection** - Automatic comparison catches deviations before they compound
-- **Task dependencies** - YAML task graph with Mermaid visualization
+- **Task execution visualization** - Watch tasks progress from waiting → executing → completed in a live diagram
+- **MCP auto-detection** - Automatically finds and configures the mermaid-collab server on first run
 - **Multi-collab support** - Run multiple design sessions simultaneously
 - **Templates** - Pre-configured workflows for features, bugfixes, refactors, and spikes
 
@@ -145,8 +132,9 @@ Resume anytime with `/collab` and select the existing session.
 - **verification-before-completion** - Ensure it's actually fixed
 
 **Collaboration**
-- **collab** - Structured design-to-implementation pipeline with state persistence
-- **brainstorming** - Socratic design refinement
+- **collab** - Structured design-to-implementation pipeline with state persistence and live diagrams
+- **brainstorming** - Socratic design refinement with mermaid diagram creation
+- **mermaid-collab** - Create and iterate on flowcharts, wireframes, and architecture diagrams
 - **rough-draft** - 4-phase refinement: interfaces → pseudocode → skeleton → handoff
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
@@ -168,8 +156,6 @@ Resume anytime with `/collab` and select the existing session.
 - **Complexity reduction** - Simplicity as primary goal
 - **Evidence over claims** - Verify before declaring success
 
-Read more: [Superpowers for Claude Code](https://blog.fsck.com/2025/10/09/superpowers/)
-
 ## Contributing
 
 Skills live directly in this repository. To contribute:
@@ -186,7 +172,7 @@ See `skills/writing-skills/SKILL.md` for the complete guide.
 Skills update automatically when you update the plugin:
 
 ```bash
-/plugin update superpowers
+/plugin update superpowers-collab
 ```
 
 ## License
@@ -195,5 +181,5 @@ MIT License - see LICENSE file for details
 
 ## Support
 
-- **Issues**: https://github.com/obra/superpowers/issues
-- **Marketplace**: https://github.com/obra/superpowers-marketplace
+- **Issues**: https://github.com/ben-mad-jlp/superpowers/issues
+- **Mermaid-Collab Server**: https://github.com/ben-mad-jlp/claude-mermaid-collab
