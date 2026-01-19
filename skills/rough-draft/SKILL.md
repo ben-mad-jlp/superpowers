@@ -531,15 +531,50 @@ Rough-draft complete. Ready for implementation:
 - [N] tasks in dependency graph
 - [N] parallel-safe tasks identified
 
-Ready to move to executing-plans? (y/n)
+Ready to move to executing-plans?
+  1. Yes, in current directory
+  2. Yes, in a new git worktree (recommended for larger features)
+  3. No, I need to revise something
 ```
 
-- If **yes**: Update collab state and invoke executing-plans skill
-  ```
-  Tool: mcp__mermaid__update_collab_session_state
-  Args: { "sessionName": "<name>", "phase": "implementation" }
-  ```
-- If **no**: Ask what needs revision, return to appropriate phase
+**Option 1 - Current directory:**
+
+Update collab state and invoke executing-plans:
+```
+Tool: mcp__mermaid__update_collab_session_state
+Args: { "sessionName": "<name>", "phase": "implementation" }
+```
+
+Then invoke executing-plans skill.
+
+**Option 2 - Git worktree:**
+
+1. Get session name from collab state
+2. Prompt for branch name:
+   ```
+   Creating worktree with branch: feature/<session-name>
+   (Press enter to accept, or type a different branch name)
+   ```
+3. Announce: "I'm using the using-git-worktrees skill to set up an isolated workspace."
+4. Invoke using-git-worktrees skill with the branch name
+5. On success:
+   - Update collab-state.json to add `worktreePath` field:
+     ```json
+     {
+       "worktreePath": "<absolute-path-to-worktree>"
+     }
+     ```
+   - Update collab state: `phase: "implementation"`
+   - Invoke executing-plans skill (now in worktree context)
+6. On failure:
+   - Report error
+   - Ask: "Continue in current directory instead? (y/n)"
+   - If yes: fall back to Option 1 flow
+   - If no: stay at rough-draft phase
+
+**Option 3 - Revise:**
+
+Ask what needs revision and return to appropriate phase.
 
 **Step 3: Invoke executing-plans**
 
