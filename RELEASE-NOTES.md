@@ -1,5 +1,20 @@
 # Superpowers Release Notes
 
+## v4.7.2 (2026-01-19)
+
+### Bug Fixes
+
+**Collab skill now starts MCP server via bash instead of relying on .mcp.json**
+
+- Removed dependency on Claude Code's `.mcp.json` auto-loading mechanism
+- Server is now started directly via `bun run src/mcp/server.ts &`
+- Simplified Step 0 flow: check if running → find path → start server
+- Documented how to use `PORT` env var for running multiple sessions on different ports
+
+**Root cause:** The previous approach assumed Claude Code would auto-load MCP servers from `.mcp.json`, but this requires restarting Claude Code. Starting the server via bash is more direct and works immediately.
+
+---
+
 ## v4.7.1 (2026-01-19)
 
 ### Bug Fixes

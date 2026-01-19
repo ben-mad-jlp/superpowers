@@ -15,26 +15,25 @@ Do NOT improvise. Do NOT ask the user questions yet. Do NOT check random directo
 
 ---
 
-## Step 0: Ensure MCP Server Running (EXECUTE THIS FIRST)
+## Step 0: Start MCP Server (EXECUTE THIS FIRST)
 
-Before calling any MCP tools, verify the mermaid-collab server is available.
+The mermaid-collab MCP server must be started for each collab session. The server starts on port 3737 by default. To run multiple sessions concurrently, set a different port via the `PORT` environment variable (e.g., `PORT=3738 bun run ...`).
 
-### 0.1 Check if .mcp.json Exists
+### 0.1 Check if Server Already Running
 
-**IMPORTANT:** Check for `.mcp.json` file FIRST using bash, before attempting any MCP tool calls:
+Try calling any MCP tool to see if the server is already running:
 
-```bash
-test -f .mcp.json && echo "exists" || echo "missing"
+```
+Tool: mcp__mermaid__get_storage_config
+Args: {}
 ```
 
-- **If `.mcp.json` exists** → Try calling `mcp__mermaid__get_storage_config()`
-  - If MCP call succeeds → Skip to "MANDATORY FIRST STEP"
-  - If MCP call fails → Continue to 0.2
-- **If `.mcp.json` is missing** → Continue to 0.2 (do NOT try MCP calls - they won't work)
+- **If MCP call succeeds** → Skip to "MANDATORY FIRST STEP"
+- **If MCP call fails** → Continue to 0.2
 
-### 0.2 Check Cached Server Path
+### 0.2 Find Server Path
 
-Read `.collab/settings.json` if it exists:
+Check `.collab/settings.json` for cached path:
 
 ```bash
 cat .collab/settings.json 2>/dev/null
@@ -43,9 +42,8 @@ cat .collab/settings.json 2>/dev/null
 If file exists and contains `serverPath`:
 1. Verify the path exists: `test -d <serverPath>`
 2. Verify it's valid: `test -f <serverPath>/src/mcp/server.ts`
-3. If both pass AND `.mcp.json` already exists → Jump to **0.6b Diagnose Connection Failure**
-4. If both pass AND `.mcp.json` is missing → Jump to **0.6 Generate .mcp.json**
-5. If either fails → Continue to 0.3
+3. If both pass → Jump to **0.5 Start the Server**
+4. If either fails → Continue to 0.3
 
 ### 0.3 Search Common Locations
 
@@ -62,20 +60,16 @@ Check these paths in order (expand `~` to home directory):
 
 For each path, check if `<path>/src/mcp/server.ts` exists.
 
-- **If found** → Jump to **0.5 Save Server Path**
-- **If none found** → Continue to 0.4
-
-### 0.4 Search with Find
+- **If found** → Jump to **0.4 Save Server Path**
+- **If none found** → Search with find:
 
 ```bash
 find ~ -maxdepth 4 -type d -name "claude-mermaid-collab" 2>/dev/null | head -1
 ```
 
-If result found and `<result>/src/mcp/server.ts` exists:
-- **Found** → Jump to **0.5 Save Server Path**
-- **Not found** → Ask user for path
+If result found and `<result>/src/mcp/server.ts` exists → Jump to **0.4 Save Server Path**
 
-**Ask user:**
+If still not found, ask user:
 ```
 Could not find claude-mermaid-collab on your machine.
 
@@ -84,15 +78,15 @@ Please provide the path to your claude-mermaid-collab directory:
 
 Validate user's path has `src/mcp/server.ts`. If invalid, show error and stop.
 
-### 0.5 Save Server Path
+### 0.4 Save Server Path
 
-Ensure `.collab/` directory exists:
+Ensure `.collab/` directory exists and save the path:
 
 ```bash
 mkdir -p .collab
 ```
 
-Save the found path to `.collab/settings.json`:
+Write to `.collab/settings.json`:
 
 ```json
 {
@@ -100,9 +94,9 @@ Save the found path to `.collab/settings.json`:
 }
 ```
 
-### 0.6 Generate .mcp.json
+### 0.5 Start the Server
 
-**First, get the absolute path to bun** (required for Claude Code to find it):
+**First, verify bun is installed:**
 
 ```bash
 which bun
@@ -110,87 +104,57 @@ which bun
 
 If bun is not found, ask the user to install it: `curl -fsSL https://bun.sh/install | bash`
 
-**Then create/update `.mcp.json` at project root using the absolute bun path:**
-
-```json
-{
-  "mcpServers": {
-    "mermaid": {
-      "command": "<absolute-path-to-bun>",
-      "args": ["run", "src/mcp/server.ts"],
-      "cwd": "<serverPath>"
-    }
-  }
-}
-```
-
-Example with real paths:
-```json
-{
-  "mcpServers": {
-    "mermaid": {
-      "command": "/Users/username/.bun/bin/bun",
-      "args": ["run", "src/mcp/server.ts"],
-      "cwd": "/Users/username/Code/claude-mermaid-collab"
-    }
-  }
-}
-```
-
-### 0.6b Diagnose Connection Failure
-
-If you reach here, `.mcp.json` exists with correct config but MCP calls fail. This means:
-- User already restarted Claude Code
-- The server is configured but not connecting
-
-**Run diagnostics:**
+**Start the server in the background:**
 
 ```bash
-# Get absolute bun path
-which bun || echo "BUN NOT FOUND"
-
-# Check what command is in .mcp.json
-cat .mcp.json | grep command
-
-# Try starting server manually to see errors
-cd <serverPath> && timeout 3 bun run src/mcp/server.ts 2>&1 || true
+cd <serverPath> && bun run src/mcp/server.ts &
 ```
 
-**Check if .mcp.json uses absolute bun path:**
-- Read the `command` field from `.mcp.json`
-- If it's just `"bun"` (not an absolute path like `/Users/.../bun`), this is likely the problem
-- **Fix:** Update `.mcp.json` to use the absolute path from `which bun`
+The server will:
+- Start on port 3737 by default
+- Output its URL (e.g., `http://localhost:3737`)
 
-**If absolute path is already correct, display to user:**
+To use a different port (e.g., if 3737 is already in use):
+
+```bash
+cd <serverPath> && PORT=3738 bun run src/mcp/server.ts &
 ```
-MCP server configured but not connecting.
+
+**Wait briefly for server startup, then verify it's running:**
+
+```
+Tool: mcp__mermaid__get_storage_config
+Args: {}
+```
+
+- **If MCP call succeeds** → Continue to "MANDATORY FIRST STEP"
+- **If MCP call fails** → Continue to 0.6
+
+### 0.6 Diagnose Startup Failure
+
+If the server didn't start, check for errors:
+
+```bash
+# Try starting in foreground to see errors
+cd <serverPath> && bun run src/mcp/server.ts 2>&1 &
+sleep 2
+```
+
+**Display to user:**
+```
+MCP server failed to start.
 
 Server path: <serverPath>
-Bun location: <which bun result>
-Server test: <startup output or error>
 
 Common fixes:
 1. Ensure bun is installed: curl -fsSL https://bun.sh/install | bash
 2. Install server dependencies: cd <serverPath> && bun install
-3. Check for port conflicts or other errors above
+3. Check for port conflicts (another process on 3737+)
 
-After fixing, restart Claude Code and run /collab again.
+After fixing, run /collab again.
 ```
 
-**Stop execution here.** Do NOT loop back to search steps.
-
----
-
-### 0.7 Notify User to Restart
-
-Display:
-```
-Created .mcp.json with mermaid-collab server at: <serverPath>
-
-Please restart Claude Code to load the MCP server, then run /collab again.
-```
-
-**Stop execution here.** User must restart Claude Code for the MCP server to load.
+**Stop execution here.**
 
 ---
 
