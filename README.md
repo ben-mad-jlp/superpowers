@@ -44,17 +44,17 @@ Then install the plugin from this marketplace:
 
 ### Verify Installation
 
-Check that commands appear:
+Check that skills appear:
 
 ```bash
 /help
 ```
 
 ```
-# Should see:
-# /superpowers:brainstorm - Interactive design refinement
-# /superpowers:write-plan - Create implementation plan
-# /superpowers:execute-plan - Execute plan in batches
+# Should see skills like:
+# /superpowers:brainstorming - Interactive design refinement
+# /superpowers:collab - Design-to-implementation pipeline
+# /superpowers:writing-plans - Create implementation plan
 ```
 
 ### Codex
@@ -79,21 +79,59 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 
 ## The Basic Workflow
 
+**Start with brainstorming** (automatic) or use `/collab` for full design-to-implementation tracking with state persistence.
+
 1. **brainstorming** - Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
 
 2. **using-git-worktrees** - Activates after design approval. Creates isolated workspace on new branch, runs project setup, verifies clean test baseline.
 
-3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks (2-5 minutes each). Every task has exact file paths, complete code, verification steps.
+3. **writing-plans** - Activates with approved design. Breaks work into bite-sized tasks. Every task has exact file paths, complete code, verification steps.
 
 4. **subagent-driven-development** or **executing-plans** - Activates with plan. Dispatches fresh subagent per task with two-stage review (spec compliance, then code quality), or executes in batches with human checkpoints.
 
-5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit. Deletes code written before tests.
+5. **test-driven-development** - Activates during implementation. Enforces RED-GREEN-REFACTOR: write failing test, watch it fail, write minimal code, watch it pass, commit.
 
 6. **requesting-code-review** - Activates between tasks. Reviews against plan, reports issues by severity. Critical issues block progress.
 
 7. **finishing-a-development-branch** - Activates when tasks complete. Verifies tests, presents options (merge/PR/keep/discard), cleans up worktree.
 
 **The agent checks for relevant skills before any task.** Mandatory workflows, not suggestions.
+
+## Collab Workflow
+
+For complex features that need structured design-to-implementation flow, use the **collab workflow**. Start with `/collab` to create an isolated design session.
+
+```
+/collab → brainstorming → rough-draft → implementation → cleanup
+```
+
+### How It Works
+
+1. **Start a collab** - Run `/collab`, pick a template (feature, bugfix, refactor, spike), get an auto-generated session name
+2. **Brainstorm** - Create a live design document with goals, decisions, diagrams, and success criteria
+3. **Rough-draft** - Progress through 4 phases: interfaces → pseudocode → skeleton → implementation handoff
+4. **Verification gates** - At each phase transition, compare artifacts against design and catch drift early
+5. **Execute** - Tasks run respecting dependency graph (parallel when safe, sequential when required)
+6. **Cleanup** - Artifacts archived to `docs/designs/<name>/`, collab folder removed
+
+### Key Features
+
+- **Context persistence** - State survives across conversations in `.collab/<name>/`
+- **Design drift detection** - Automatic comparison catches deviations before they compound
+- **Task dependencies** - YAML task graph with Mermaid visualization
+- **Multi-collab support** - Run multiple design sessions simultaneously
+- **Templates** - Pre-configured workflows for features, bugfixes, refactors, and spikes
+
+### Quick Start
+
+```
+You: /collab
+Agent: What type of work? [feature/bugfix/refactor/spike]
+You: feature
+Agent: Created collab "bright-calm-river". Starting brainstorming...
+```
+
+Resume anytime with `/collab` and select the existing session.
 
 ## What's Inside
 
@@ -106,8 +144,10 @@ Fetch and follow instructions from https://raw.githubusercontent.com/obra/superp
 - **systematic-debugging** - 4-phase root cause process (includes root-cause-tracing, defense-in-depth, condition-based-waiting techniques)
 - **verification-before-completion** - Ensure it's actually fixed
 
-**Collaboration** 
+**Collaboration**
+- **collab** - Structured design-to-implementation pipeline with state persistence
 - **brainstorming** - Socratic design refinement
+- **rough-draft** - 4-phase refinement: interfaces → pseudocode → skeleton → handoff
 - **writing-plans** - Detailed implementation plans
 - **executing-plans** - Batch execution with checkpoints
 - **dispatching-parallel-agents** - Concurrent subagent workflows
