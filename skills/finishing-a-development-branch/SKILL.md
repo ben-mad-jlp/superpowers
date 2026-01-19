@@ -195,11 +195,32 @@ git worktree remove <worktree-path>
 - Get typed confirmation for Option 4
 - Clean up worktree for Options 1 & 4 only
 
+## Collab Session Cleanup
+
+After the development branch work is complete (merged, PR created, or kept):
+
+```
+Development branch work complete.
+
+To close this collab session, run `/collab-cleanup`
+- Archive design artifacts to `docs/designs/`
+- Or delete the session
+- Or keep it for reference
+
+Run cleanup now? (y/n)
+```
+
+- If **yes**: Invoke collab-cleanup skill
+- If **no**: "Session kept open. Run `/collab-cleanup` when ready."
+
 ## Integration
 
 **Called by:**
 - **subagent-driven-development** (Step 7) - After all tasks complete
 - **executing-plans** (Step 5) - After all batches complete
+
+**Transitions to:**
+- **collab-cleanup** - After branch work completes (within collab workflow)
 
 **Pairs with:**
 - **using-git-worktrees** - Cleans up worktree created by that skill

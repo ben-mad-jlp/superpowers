@@ -57,11 +57,28 @@ tasks:
 3. Within each wave, identify parallel-safe tasks (those with `parallel: true` or independent file sets)
 
 **Execution State Tracking:**
+
+Initialize task tracking in `collab-state.json`:
+
+```json
+{
+  "phase": "implementation",
+  "completedTasks": [],
+  "pendingTasks": ["task-1", "task-2", "task-3"],
+  "pendingVerificationIssues": []
+}
 ```
-completed: []
-in_progress: []
-pending: [all tasks initially]
+
+Use MCP tool or direct file update to initialize:
 ```
+Tool: mcp__mermaid__update_collab_session_state
+Args: {
+  "sessionName": "<name>",
+  "phase": "implementation"
+}
+```
+
+Then update the file directly to add task arrays (MCP tool doesn't support custom fields yet).
 
 ### Anti-Drift Rules
 
@@ -180,6 +197,8 @@ When within a collab workflow, run verification after each task completes:
 
 **On Verification Success:**
 - Mark task as verified
+- Update `collab-state.json`: move task from `pendingTasks` to `completedTasks`
+- Update `lastActivity` timestamp
 - Unlock dependent tasks
 - Proceed to next ready tasks
 
@@ -211,7 +230,21 @@ Based on feedback:
 
 ### Step 5: Complete Development
 
-After all tasks complete and verified:
+After all tasks complete and verified, show summary and ask for confirmation:
+
+```
+Implementation complete:
+- [N] tasks completed: [list task IDs]
+- All tests passing
+- All TODOs resolved
+
+Ready to move to finishing-a-development-branch? (y/n)
+```
+
+- If **yes**: Invoke finishing-a-development-branch skill
+- If **no**: Ask what needs to be addressed
+
+**On confirmation:**
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
 - **REQUIRED SUB-SKILL:** Use superpowers:finishing-a-development-branch
 - Follow that skill to verify tests, present options, execute choice

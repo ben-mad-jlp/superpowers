@@ -29,6 +29,17 @@ Before starting rough-draft, ensure:
 - Design doc passed brainstorming's completeness gate
 - `collab-state.json` phase is set to `rough-draft/interface`
 
+## Writing Quality
+
+When writing interfaces and pseudocode, use clear, precise language.
+
+**If `obra/the-elements-of-style` plugin is available**, invoke it for guidance on:
+- Omitting needless words
+- Using active voice
+- Being specific, not vague
+
+Apply these principles to interface documentation and pseudocode comments.
+
 ## Phase 1: Interface
 
 Define the structural contracts of the system.
@@ -510,18 +521,25 @@ Convert the task dependency graph into an executable plan:
 - auth-tests (can run parallel with middleware)
 ```
 
-**Step 2: Hand off to executing-plans**
+**Step 2: Confirm transition to executing-plans**
+
+Show summary and ask for confirmation:
 
 ```
-The skeleton phase is complete. Ready to begin implementation.
+Rough-draft complete. Ready for implementation:
+- [N] files created with stubs
+- [N] tasks in dependency graph
+- [N] parallel-safe tasks identified
 
-Transitioning to executing-plans skill with:
-- Design doc: .collab/<name>/documents/design.md
-- Task dependency graph: [embedded in design doc]
-- Parallel-safe tasks: [list tasks with parallel: true]
-
-Starting with parallel batch 1...
+Ready to move to executing-plans? (y/n)
 ```
+
+- If **yes**: Update collab state and invoke executing-plans skill
+  ```
+  Tool: mcp__mermaid__update_collab_session_state
+  Args: { "sessionName": "<name>", "phase": "implementation" }
+  ```
+- If **no**: Ask what needs revision, return to appropriate phase
 
 **Step 3: Invoke executing-plans**
 

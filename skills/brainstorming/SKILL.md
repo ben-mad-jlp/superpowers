@@ -68,11 +68,16 @@ digraph brainstorming_phases {
 ### Proposed Tag Workflow
 
 During DESIGNING phase, for each section:
+
 1. Write section to design doc with `[PROPOSED]` marker
-2. Tell user: "I've added a proposed section to the design doc. Please review."
-3. Ask: "Does this section look right?"
-4. If accepted: remove `[PROPOSED]` marker, continue to next section
-5. If rejected: discuss, revise, repeat
+2. Tell user: "I've added a proposed section: **[Section Name]**"
+3. Provide preview link: "Review at: [mermaid-collab preview URL]"
+4. Ask: "Accept this section? (accept / reject / edit)"
+
+**User responses:**
+- **accept**: Remove `[PROPOSED]` marker, continue to next section
+- **reject**: Discuss what's wrong, revise the section, repeat from step 1
+- **edit**: User edits directly in browser, Claude acknowledges changes and continues
 
 ### Red Flags - Phase Violations
 
@@ -245,12 +250,24 @@ cat .collab/<name>/documents/design.md
 - Do NOT proceed to rough-draft until all sections pass
 
 **If gate passes:**
-- Update collab state using MCP tool:
+
+Show summary and ask for confirmation:
+
+```
+Brainstorming complete. Design covers:
+- [Bullet 1: key topic from design]
+- [Bullet 2: key topic from design]
+- [Bullet 3: key topic from design]
+
+Ready to move to rough-draft? (y/n)
+```
+
+- If **yes**: Update collab state and invoke rough-draft skill
   ```
   Tool: mcp__mermaid__update_collab_session_state
   Args: { "sessionName": "<name>", "phase": "rough-draft/interface" }
   ```
-- Invoke rough-draft skill
+- If **no**: Ask what else needs to be explored, return to appropriate phase
 
 ## Context Preservation
 
@@ -289,6 +306,17 @@ ls .collab/<name>/diagrams/
 - Ask: "Ready to set up for implementation?"
 - Use superpowers:using-git-worktrees to create isolated workspace
 - Use superpowers:writing-plans to create detailed implementation plan
+
+## Writing Quality
+
+When writing design doc sections, use clear, concise prose.
+
+**If `obra/the-elements-of-style` plugin is available**, invoke it for guidance on:
+- Omitting needless words
+- Using active voice
+- Being specific, not vague
+
+Apply these principles to all design doc prose.
 
 ## Key Principles
 
