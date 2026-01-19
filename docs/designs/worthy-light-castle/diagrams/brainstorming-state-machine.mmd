@@ -1,0 +1,44 @@
+graph TD
+    %% Node Definitions
+    Start(["Start Brainstorming"])
+    Exploring(("EXPLORING"))
+    Clarifying(("CLARIFYING"))
+    Designing(("DESIGNING"))
+    Validating(("VALIDATING"))
+    Transition(["Invoke rough-draft"])
+    
+    ExploreCheck{"Context gathered?"}
+    ClarifyCheck{"Each item discussed?<br/>Asked 'what else'?"}
+    DesignCheck{"All sections<br/>validated?"}
+    ValidateCheck{"Completeness<br/>gate passed?"}
+
+    %% Connections
+    Start --> Exploring
+    Exploring --> ExploreCheck
+    ExploreCheck -->|No| Exploring
+    ExploreCheck -->|Yes| Clarifying
+    
+    Clarifying --> ClarifyCheck
+    ClarifyCheck -->|No| Clarifying
+    ClarifyCheck -->|Yes| Designing
+    
+    Designing --> DesignCheck
+    DesignCheck -->|No| Designing
+    DesignCheck -->|Needs clarification| Clarifying
+    DesignCheck -->|Yes| Validating
+    
+    Validating --> ValidateCheck
+    ValidateCheck -->|No| Designing
+    ValidateCheck -->|Yes| Transition
+
+    %% Styles
+    style Start fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Exploring fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Clarifying fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Designing fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Validating fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Transition fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style ExploreCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style ClarifyCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style DesignCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style ValidateCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px

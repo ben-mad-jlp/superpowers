@@ -1,0 +1,35 @@
+graph TD
+    %% Node Definitions
+    Start(["Start Rough-Draft"])
+    Interface(("INTERFACE"))
+    Pseudocode(("PSEUDOCODE"))
+    Skeleton(("SKELETON"))
+    Handoff(["Invoke executing-plans"])
+    
+    InterfaceCheck{"All signatures<br/>defined?"}
+    PseudocodeCheck{"All functions<br/>have logic?"}
+    SkeletonCheck{"Stubs created?<br/>Dependency graph?"}
+
+    %% Connections
+    Start --> Interface
+    Interface --> InterfaceCheck
+    InterfaceCheck -->|No| Interface
+    InterfaceCheck -->|Yes, verify| Pseudocode
+    
+    Pseudocode --> PseudocodeCheck
+    PseudocodeCheck -->|No| Pseudocode
+    PseudocodeCheck -->|Yes, verify| Skeleton
+    
+    Skeleton --> SkeletonCheck
+    SkeletonCheck -->|No| Skeleton
+    SkeletonCheck -->|Yes, verify| Handoff
+
+    %% Styles
+    style Start fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Interface fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Pseudocode fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Skeleton fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Handoff fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style InterfaceCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style PseudocodeCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style SkeletonCheck fill:#fff9c4,stroke:#f9a825,stroke-width:2px

@@ -1,0 +1,45 @@
+graph TD
+    %% Node Definitions
+    Produce(["Produce artifact"])
+    Compare{"Drift from<br/>design doc?"}
+    Continue(["Continue to next phase"])
+    Present["Present drift with pros/cons"]
+    KeepDecision{"User: Keep change?"}
+    UpdateDesign["Update design doc"]
+    SignificantRec["AI recommends:<br/>significant or minor?"]
+    SignificantDecision{"User: Go back<br/>to brainstorming?"}
+    BackToBrainstorm(["Back to brainstorming"])
+    RestartRec["AI recommends:<br/>restart from where?"]
+    RestartDecision{"User: Restart<br/>rough-draft from?"}
+    RestartBeginning(["Restart from INTERFACE"])
+    RestartPhase(["Redo current phase"])
+
+    %% Connections
+    Produce --> Compare
+    Compare -->|No| Continue
+    Compare -->|Yes| Present
+    Present --> KeepDecision
+    KeepDecision -->|Yes| UpdateDesign
+    UpdateDesign --> SignificantRec
+    SignificantRec --> SignificantDecision
+    SignificantDecision -->|Yes| BackToBrainstorm
+    SignificantDecision -->|No| Continue
+    KeepDecision -->|No| RestartRec
+    RestartRec --> RestartDecision
+    RestartDecision -->|Beginning| RestartBeginning
+    RestartDecision -->|Current phase| RestartPhase
+
+    %% Styles
+    style Produce fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style Compare fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style Continue fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Present fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style KeepDecision fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style UpdateDesign fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style SignificantRec fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style SignificantDecision fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style BackToBrainstorm fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style RestartRec fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style RestartDecision fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style RestartBeginning fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style RestartPhase fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
