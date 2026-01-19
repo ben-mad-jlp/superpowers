@@ -1,0 +1,60 @@
+graph TD
+    %% Node Definitions
+    Start(["/collab invoked"])
+    TryMCP["Try MCP tool call"]
+    MCPWorks{"MCP works?"}
+    Continue(["Continue normal flow"])
+    CheckSettings["Read .collab/settings.json"]
+    HasPath{"serverPath exists?"}
+    PathValid{"Path valid?"}
+    CheckCommon["Check common locations"]
+    FoundCommon{"Found?"}
+    SearchFind["Search with find"]
+    FoundSearch{"Found?"}
+    AskUser["Ask user for path"]
+    ValidateUser{"Path valid?"}
+    SaveSettings["Save to settings.json"]
+    GenerateMCP["Generate .mcp.json"]
+    Restart(["Tell user to restart Claude Code"])
+    Error(["Error: invalid path"])
+
+    %% Connections
+    Start --> TryMCP
+    TryMCP --> MCPWorks
+    MCPWorks -->|Yes| Continue
+    MCPWorks -->|No| CheckSettings
+    CheckSettings --> HasPath
+    HasPath -->|Yes| PathValid
+    HasPath -->|No| CheckCommon
+    PathValid -->|Yes| GenerateMCP
+    PathValid -->|No| CheckCommon
+    CheckCommon --> FoundCommon
+    FoundCommon -->|Yes| SaveSettings
+    FoundCommon -->|No| SearchFind
+    SearchFind --> FoundSearch
+    FoundSearch -->|Yes| SaveSettings
+    FoundSearch -->|No| AskUser
+    AskUser --> ValidateUser
+    ValidateUser -->|Yes| SaveSettings
+    ValidateUser -->|No| Error
+    SaveSettings --> GenerateMCP
+    GenerateMCP --> Restart
+
+    %% Styles
+    style Start fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Continue fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Restart fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style Error fill:#ffcdd2,stroke:#c62828,stroke-width:2px
+    style MCPWorks fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style HasPath fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style PathValid fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style FoundCommon fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style FoundSearch fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style ValidateUser fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style TryMCP fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style CheckSettings fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style CheckCommon fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style SearchFind fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style AskUser fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style SaveSettings fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
+    style GenerateMCP fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
