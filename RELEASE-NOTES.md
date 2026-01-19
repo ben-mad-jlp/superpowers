@@ -1,5 +1,85 @@
 # Superpowers Release Notes
 
+## v4.3.0 (2026-01-19)
+
+### New Features
+
+**Phase state machines to prevent skipping workflow steps**
+
+Addresses failure mode where agent jumped from exploration directly to implementation, skipping clarification and design validation phases.
+
+**brainstorming skill:**
+- Added explicit 5-phase state machine (EXPLORING → CLARIFYING → DESIGNING → VALIDATING → TRANSITION)
+- Added phase transition rules with required announcements
+- Added proposed tag workflow for design section validation
+- Added red flags table for phase violations
+- Restructured "The Process" around explicit phases
+
+**rough-draft skill:**
+- Added proposed tag workflow for INTERFACE/PSEUDOCODE/SKELETON phases
+- Added drift detection with pros/cons presentation
+- Added decision flows for keeping or discarding changes
+- Added significance assessment for design changes
+
+---
+
+## v4.2.0 (2026-01-19)
+
+### Improvements
+
+**Updated skills to use MCP collab session tools**
+
+Collab workflow skills now use the mermaid-collab MCP server's native session management tools instead of manual file operations:
+
+- `mcp__mermaid__create_collab_session` - Creates new sessions with auto-generated names
+- `mcp__mermaid__get_collab_session_state` - Reads session phase and pending issues
+- `mcp__mermaid__update_collab_session_state` - Updates phase and verification issues
+- `mcp__mermaid__list_collab_sessions` - Lists available sessions for resuming
+- `mcp__mermaid__configure_storage` - Points server at session folder
+
+Skills updated: collab, brainstorming, rough-draft
+
+---
+
+## v4.1.2 (2026-01-18)
+
+### Fixes
+
+- Added mandatory first step to collab skill ensuring session setup
+- Removed `forkedFrom` field from plugin.json
+- Synced marketplace.json metadata with plugin.json
+
+---
+
+## v4.1.0 (2026-01-15)
+
+### New Features
+
+**Collab workflow for structured design-to-implementation**
+
+New workflow providing isolated workspaces for complex features:
+
+- **collab skill** - Entry point that creates/resumes sessions, manages phases (brainstorming → rough-draft → implementation)
+- **rough-draft skill** - Four-phase design refinement (interface → pseudocode → skeleton → implementation handoff)
+- **Slash commands** - `/collab` and `/rough-draft` for quick invocation
+
+**Enhanced brainstorming**
+
+- Live design doc updates during brainstorming sessions
+- Completeness gate before transitioning to rough-draft
+- Template-specific focus (feature, bugfix, refactor, spike)
+- Mermaid Collab visualization guidance for wireframes and architecture
+
+**Infrastructure improvements**
+
+- `configure_storage` in mermaid-collab to point at session folders
+- Anti-drift rules across execution skills to prevent design changes during implementation
+- Dependency graph support in executing-plans
+- Verify-phase hook with drift detection
+- Sync-diagram-to-doc hook for automatic diagram embedding
+
+---
+
 ## v4.0.3 (2025-12-26)
 
 ### Improvements
