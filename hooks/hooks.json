@@ -10,6 +10,17 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__mermaid__create_diagram|mcp__mermaid__update_diagram",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.cmd\" sync-diagram-to-doc.sh"
+          }
+        ]
+      }
     ]
   }
 }
