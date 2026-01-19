@@ -1,5 +1,31 @@
 # Superpowers Release Notes
 
+## v4.7.0 (2026-01-19)
+
+### New Features
+
+**MCP server auto-detection and configuration**
+
+The collab skill now automatically detects and configures the mermaid-collab MCP server, making the plugin portable across machines:
+
+- **Step 0 added to collab skill** - Before any MCP tool calls, verifies server is running
+- **Auto-detection** - Searches common locations (`~/Code/`, `~/Projects/`, sibling directories)
+- **Caching** - Saves found path to `.collab/settings.json` for instant startup on subsequent runs
+- **Generates `.mcp.json`** - Creates machine-specific MCP config with correct server path
+
+**New files:**
+- `.mcp.json.example` - Template showing expected MCP config structure
+- `.mcp.json` now gitignored (machine-specific)
+
+**Flow on new machine:**
+1. User runs `/collab`
+2. MCP fails → skill searches for mermaid-collab
+3. Found → saves to `.collab/settings.json`, generates `.mcp.json`
+4. User restarts Claude Code → MCP server loads
+5. Subsequent `/collab` invocations work immediately
+
+---
+
 ## v4.6.0 (2026-01-19)
 
 ### New Features
