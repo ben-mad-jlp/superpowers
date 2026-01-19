@@ -1,0 +1,27 @@
+graph TD
+    %% Node Definitions
+    RoughDraftDone(["Rough-draft completes"])
+    Prompt{"Ready to implement?"}
+    CurrentDir["Continue in current directory"]
+    WorktreePrompt["Show branch name prompt"]
+    InvokeWorktree["Invoke using-git-worktrees"]
+    UpdateState["Update collab-state.json"]
+    ExecutePlans(["Invoke executing-plans"])
+    Revise["Return to rough-draft"]
+
+    %% Connections
+    RoughDraftDone --> Prompt
+    Prompt -->|"1. Current dir"| CurrentDir
+    Prompt -->|"2. Git worktree"| WorktreePrompt
+    Prompt -->|"3. Revise"| Revise
+    CurrentDir --> ExecutePlans
+    WorktreePrompt --> InvokeWorktree
+    InvokeWorktree --> UpdateState
+    UpdateState --> ExecutePlans
+
+    %% Styles
+    style RoughDraftDone fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style ExecutePlans fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    style Prompt fill:#fff9c4,stroke:#f9a825,stroke-width:2px
+    style InvokeWorktree fill:#bbdefb,stroke:#1976d2,stroke-width:2px
+    style UpdateState fill:#ffe0b2,stroke:#f57c00,stroke-width:2px
